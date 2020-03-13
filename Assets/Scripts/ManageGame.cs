@@ -13,20 +13,22 @@ public class ManageGame : MonoBehaviour
     public static ManageGame instance;
 
     public string attackedCountry;
+    public string playerTribe = "Atlanteans";
 
     public bool battleHasEnded;
     public bool battleWon;
-
     public bool gameEnded;
-
     public bool playerTurn = true;
     public bool turnOver = false;
 
     public int exp;
     public int money;
+    public int numPlayers;
     public int turn = 0;
+    public int iturn = 0;
+    public int playerIndex = 0;
 
-    public string playerTribe = "Atlanteans";
+    public string[] players = System.Enum.GetNames(typeof(Country.ControllingPlayers));
 
     [System.Serializable]
     public class SaveData
@@ -49,41 +51,93 @@ public class ManageGame : MonoBehaviour
         }
         DontDestroyOnLoad(gameObject);
 
+        numPlayers = players.Length;
+
+        // get player index
+        for (int i = 0; i < numPlayers; i++)
+        {
+            if (players[i] == playerTribe)
+            {
+                playerIndex = i;
+            }
+        }
+
         // begin main game loop
-        gameLoop();
+        StartCoroutine(gameLoop());
     }
 
     // the main game loop
-    public async Task gameLoop()
+    private IEnumerator gameLoop()
     {
-        string[] players = System.Enum.GetNames(typeof(Country.ControllingPlayers));
-        Text ptText = GameObject.Find("PlayerTurnText").GetComponent<Text>();
-
         while (true)
         {
-            ptText.text = players[instance.turn];
-            if (players[instance.turn] == playerTribe)
+            // loop through AI players until player's turn
+            for (int i = 0; i < playerIndex; i++)
             {
-                instance.turn += 1;
-                ptText.text = ptText.text + " (YOU)";
-                instance.playerTurn = true;
-                while (turnOver == false)
-                {
-                    await Task.Delay(10);
-                }
+                aiTurn(i);
+                yield return new WaitForSeconds(1.0f);
             }
-            else
+            
+            // get player input
+            GameObject.Find("PlayerTurnText").GetComponent<Text>().text = players[playerIndex] + " (YOU)";
+            iturn++;
+            print(iturn + " YOU");
+            yield return waitForPlayerTurn();
+            
+            // loop through rest of AI players
+            for (int i = playerIndex + 1; i < players.Length; i++)
             {
+                aiTurn(i);
+                yield return new WaitForSeconds(1.0f);
+            }
+        }
+    }
+
+    // AI Logic
+    private void aiTurn(int i)
+    {
+        removePlayers();
+        if (players[i] != "")
+        {
+            GameObject.Find("PlayerTurnText").GetComponent<Text>().text = players[i];
+            iturn++;
+            print(iturn + ": " + players[i] + " doing AI stuff");
+        }
+    }
+
+    private IEnumerator waitForPlayerTurn()
+    {
+        bool done = false;
+        while (!done) // essentially a "while true", but with a bool to break out naturally
+        {
+            instance.playerTurn = true;
+            if (turnOver)
+            {
+                turnOver = false;
                 instance.playerTurn = false;
-                print(players[instance.turn] + " is doing AI stuff");
-                await Task.Delay(1000);
+                done = true; // breaks the loop
             }
-            if (instance.turn == 10)
+            yield return null; // wait until next frame, then continue execution from here (loop continues)
+        }
+    }
+
+    // remove players with no countries left
+    public void removePlayers()
+    {
+        List<string> activePlayers = new List<string>();
+        GameObject[] theArray = GameObject.FindGameObjectsWithTag("Country") as GameObject[];
+        foreach (GameObject theCountry in theArray)
+        {
+            CountryHandler countHandler = theCountry.GetComponent<CountryHandler>();
+            activePlayers.Add(countHandler.country.controllingPlayer.ToString());
+        }
+        for (int i = 0; i < instance.players.Length; i++)
+        {
+            if (string.IsNullOrEmpty(instance.players[i])) continue;
+            if (!activePlayers.Contains(instance.players[i]))
             {
-                instance.turn -= 11;
+                instance.players[i] = "";
             }
-            instance.turn += 1;
-            Saving();
         }
     }
 
@@ -109,7 +163,6 @@ public class ManageGame : MonoBehaviour
 
     public void Loading()
     {
-        print("loading");
         if (File.Exists(Application.persistentDataPath + "/SaveFile.dat"))
         {
             BinaryFormatter bf = new BinaryFormatter();

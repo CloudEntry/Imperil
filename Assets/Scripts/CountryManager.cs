@@ -22,17 +22,6 @@ public class CountryManager : MonoBehaviour
     {
         attackPanel.SetActive(false);
         AddCountryData();
-
-        // switch country ownership to player when they win the battle and set money/exp rewards
-        if (ManageGame.instance.battleHasEnded && ManageGame.instance.battleWon)
-        {
-            CountryHandler count = GameObject.Find(ManageGame.instance.attackedCountry).GetComponent<CountryHandler>();
-            count.country.controllingPlayer = Country.ControllingPlayers.Atlanteans;
-            ManageGame.instance.exp += count.country.expReward;
-            ManageGame.instance.money += count.country.moneyReward;
-            TintCountries();
-        }
-        ManageGame.instance.Saving(); // save game
     }
 
     // Inbuilt Unity function gets all the game objects with 'country' tag and adds them to list
@@ -86,7 +75,19 @@ public class CountryManager : MonoBehaviour
 
     public void StartBattle()
     {
-        SceneManager.LoadScene("Fight");
+        //SceneManager.LoadScene("Fight");
+
+        // RNG for whether attacker wins 0 -> 1
+        int num = Random.Range(0, 2);
+        if (num == 1)
+        {
+            CountryHandler count = GameObject.Find(ManageGame.instance.attackedCountry).GetComponent<CountryHandler>();
+            count.country.controllingPlayer = Country.ControllingPlayers.Atlanteans;
+            ManageGame.instance.exp += count.country.expReward;
+            ManageGame.instance.money += count.country.moneyReward;
+            TintCountries();
+        }
+        DisableAttackPanel();
         ManageGame.instance.turnOver = true;
         ManageGame.instance.Saving(); // save game
     }
