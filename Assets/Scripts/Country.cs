@@ -26,4 +26,6 @@ public class Country
 
     public int moneyReward;
     public int expReward;
+
+    public int troops;
 }

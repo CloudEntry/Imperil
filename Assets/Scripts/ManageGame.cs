@@ -62,6 +62,9 @@ public class ManageGame : MonoBehaviour
             }
         }
 
+        // check how many troops assigned
+        print("=================================================");
+
         // begin main game loop
         StartCoroutine(gameLoop());
     }
@@ -72,53 +75,90 @@ public class ManageGame : MonoBehaviour
         while (true)
         {
             // loop through AI players until player's turn
-            for (int i = 0; i < playerIndex; i++)
+            for (int i = 0; i < players.Length; i++)
             {
-                aiTurn(i);
-                yield return new WaitForSeconds(1.0f);
-            }
-            
-            // get player input
-            GameObject.Find("PlayerTurnText").GetComponent<Text>().text = players[playerIndex] + " (YOU)";
-            iturn++;
-            print(iturn + " YOU");
-            yield return waitForPlayerTurn();
-            
-            // loop through rest of AI players
-            for (int i = playerIndex + 1; i < players.Length; i++)
-            {
-                aiTurn(i);
-                yield return new WaitForSeconds(1.0f);
+                // remove players that have no countries left
+                removePlayers();
+
+                Dictionary<string, List<string>> playerCountries = getPlayerCountriesDict();
+
+                // show player countries in UI Panel
+
+                // get reinforcements based on how many countries player owns
+                int reinforcements = playerCountries[players[i]].Count;
+
+                if (i == playerIndex)
+                    yield return playerMove(reinforcements);
+                else if (players[i] != "")
+                {
+                    aiMove(i, reinforcements);
+                    yield return new WaitForSeconds(1.0f);
+                }
+                iturn++;
             }
         }
+    }
+
+    public Dictionary<string, List<string>> getPlayerCountriesDict()
+    {
+        Dictionary<string, List<string>> playerCountries = new Dictionary<string, List<string>>();
+        GameObject[] theArray = GameObject.FindGameObjectsWithTag("Country") as GameObject[];
+        foreach (GameObject theCountry in theArray)
+        {
+            CountryHandler countHandler = theCountry.GetComponent<CountryHandler>();
+            if (playerCountries.ContainsKey(countHandler.country.controllingPlayer.ToString()))
+            {
+                playerCountries[countHandler.country.controllingPlayer.ToString()].Add(countHandler.country.name.ToString());
+            }
+            else
+            {
+                playerCountries[countHandler.country.controllingPlayer.ToString()] = new List<string>() { countHandler.country.name.ToString() };
+            }
+        }
+
+        // test
+        string text = "";
+        foreach (KeyValuePair<string, List<string>> kvp in playerCountries)
+        {
+            string tribeText = kvp.Key + ": ";
+            foreach (string country in kvp.Value)
+                tribeText += country + ", ";
+            text += tribeText + " \n";
+        }
+        // print(text);
+
+        return playerCountries;
     }
 
     // AI Logic
-    private void aiTurn(int i)
+    private void aiMove(int i, int reinforcements)
     {
-        removePlayers();
-        if (players[i] != "")
-        {
-            GameObject.Find("PlayerTurnText").GetComponent<Text>().text = players[i];
-            iturn++;
-            print(iturn + ": " + players[i] + " doing AI stuff");
-        }
+        GameObject.Find("PlayerTurnText").GetComponent<Text>().text = players[i];
+        print(iturn + ": " + players[i] + " doing AI stuff");
+
+        // picks random country to allocate reinforcements
+
+        // manouvre troops
+
+        // attack
     }
 
-    private IEnumerator waitForPlayerTurn()
+    private IEnumerator playerMove(int reinforcements)
     {
-        bool done = false;
-        while (!done) // essentially a "while true", but with a bool to break out naturally
+        GameObject.Find("PlayerTurnText").GetComponent<Text>().text = players[playerIndex] + " (YOU)";
+        print(iturn + " YOU");
+        turnOver = false;
+        instance.playerTurn = true;
+
+        // pick a country to allocate reinforcements
+        print("pick a country to allocate " + reinforcements + " reinforcements");
+
+        while (!turnOver)
         {
-            instance.playerTurn = true;
-            if (turnOver)
-            {
-                turnOver = false;
-                instance.playerTurn = false;
-                done = true; // breaks the loop
-            }
+            // manouvre troops
             yield return null; // wait until next frame, then continue execution from here (loop continues)
         }
+        instance.playerTurn = false;
     }
 
     // remove players with no countries left
