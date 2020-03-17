@@ -14,12 +14,15 @@ public class ManageGame : MonoBehaviour
 
     public string attackedCountry;
     public string playerTribe = "Atlanteans";
+    public Country allocateTroopsCountry;
 
     public bool battleHasEnded;
     public bool battleWon;
     public bool gameEnded;
-    public bool playerTurn = true;
-    public bool turnOver = false;
+    public bool playerTurn;
+    public bool turnOver;
+    public bool playerTroopAllocate;
+    public bool troopAllocateOver;
 
     public int exp;
     public int money;
@@ -62,6 +65,9 @@ public class ManageGame : MonoBehaviour
             }
         }
 
+        instance.playerTurn = false;
+        instance.playerTroopAllocate = false;
+
         // check how many troops assigned
         print("=================================================");
 
@@ -74,11 +80,9 @@ public class ManageGame : MonoBehaviour
     {
         while (true)
         {
-            // loop through AI players until player's turn
             for (int i = 0; i < players.Length; i++)
             {
-                // remove players that have no countries left
-                removePlayers();
+                removePlayers();    // remove players that have no countries left
 
                 Dictionary<string, List<string>> playerCountries = getPlayerCountriesDict();
 
@@ -136,28 +140,38 @@ public class ManageGame : MonoBehaviour
         GameObject.Find("PlayerTurnText").GetComponent<Text>().text = players[i];
         print(iturn + ": " + players[i] + " doing AI stuff");
 
-        // picks random country to allocate reinforcements
+        // Pick random country to allocate reinforcements
 
-        // manouvre troops
+        // Manouvre troops
 
-        // attack
+        // Attack
     }
 
     private IEnumerator playerMove(int reinforcements)
     {
         GameObject.Find("PlayerTurnText").GetComponent<Text>().text = players[playerIndex] + " (YOU)";
         print(iturn + " YOU");
-        turnOver = false;
-        instance.playerTurn = true;
+        instance.turnOver = false;
+        instance.troopAllocateOver = false;
 
-        // pick a country to allocate reinforcements
-        print("pick a country to allocate " + reinforcements + " reinforcements");
+        instance.playerTroopAllocate = true;
 
-        while (!turnOver)
-        {
-            // manouvre troops
+        // Assign reinforcements
+        print("Pick a country to allocate " + reinforcements + " reinforcements");  // Make this a UI Label
+
+        while (!instance.troopAllocateOver)
             yield return null; // wait until next frame, then continue execution from here (loop continues)
-        }
+        print("Allocate " + reinforcements + " troops to " + instance.allocateTroopsCountry.name.ToString());
+        instance.allocateTroopsCountry.troops += reinforcements;
+        instance.playerTroopAllocate = false;
+
+        // Manouvre troops
+
+        // Attack
+        print("Choose a country to attack");
+        instance.playerTurn = true;
+        while (!instance.turnOver)
+            yield return null; // wait until next frame, then continue execution from here (loop continues)
         instance.playerTurn = false;
     }
 

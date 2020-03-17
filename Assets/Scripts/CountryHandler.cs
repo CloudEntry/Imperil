@@ -95,6 +95,16 @@ public class CountryHandler : MonoBehaviour
         {
             ShowGUI();
         }
+        else if (country.controllingPlayer.ToString() == ManageGame.instance.playerTribe && ManageGame.instance.playerTroopAllocate)
+        {
+            allocateTroops();
+        }
+    }
+
+    private void allocateTroops()
+    {
+        ManageGame.instance.allocateTroopsCountry = country;
+        ManageGame.instance.troopAllocateOver = true;
     }
 
     // sets name variable to name of Component in Unity
