@@ -23,6 +23,7 @@ public class ManageGame : MonoBehaviour
     public bool turnOver;
     public bool playerTroopAllocate;
     public bool troopAllocateOver;
+    public bool manouvreOver;
 
     public int exp;
     public int money;
@@ -32,6 +33,8 @@ public class ManageGame : MonoBehaviour
     public int playerIndex = 0;
 
     public string[] players = System.Enum.GetNames(typeof(Country.ControllingPlayers));
+
+    public GameObject mtPanel;
 
     [System.Serializable]
     public class SaveData
@@ -68,6 +71,9 @@ public class ManageGame : MonoBehaviour
         instance.playerTurn = false;
         instance.playerTroopAllocate = false;
 
+        mtPanel = GameObject.Find("ManouvrePanel");
+        mtPanel.SetActive(false);
+
         // check how many troops assigned
         print("=================================================");
 
@@ -92,11 +98,11 @@ public class ManageGame : MonoBehaviour
                 int reinforcements = playerCountries[players[i]].Count;
 
                 if (i == playerIndex)
-                    yield return playerMove(reinforcements);
+                    yield return playerMove(reinforcements, playerCountries[players[i]]);
                 else if (players[i] != "")
                 {
                     aiMove(i, reinforcements);
-                    yield return new WaitForSeconds(1.0f);
+                    yield return new WaitForSeconds(0.1f);
                 }
                 iturn++;
             }
@@ -147,12 +153,13 @@ public class ManageGame : MonoBehaviour
         // Attack
     }
 
-    private IEnumerator playerMove(int reinforcements)
+    private IEnumerator playerMove(int reinforcements, List<string> countries)
     {
         GameObject.Find("PlayerTurnText").GetComponent<Text>().text = players[playerIndex] + " (YOU)";
         print(iturn + " YOU");
         instance.turnOver = false;
         instance.troopAllocateOver = false;
+        instance.manouvreOver = false;
 
         instance.playerTroopAllocate = true;
 
@@ -164,15 +171,73 @@ public class ManageGame : MonoBehaviour
         print("Allocate " + reinforcements + " troops to " + instance.allocateTroopsCountry.name.ToString());
         instance.allocateTroopsCountry.troops += reinforcements;
         instance.playerTroopAllocate = false;
-
+        
         // Manouvre troops
+        print("Manouvre Troops");
+        mtPanel.SetActive(true);
+        Dropdown numTroopsDD = GameObject.Find("NumTroops").GetComponent<Dropdown>();
+        Dropdown countryA = GameObject.Find("CountryA").GetComponent<Dropdown>();
+        Dropdown countryB = GameObject.Find("CountryB").GetComponent<Dropdown>();
+        countryA.options.Clear();
+        countryB.options.Clear();
+        numTroopsDD.options.Clear();
+        foreach (string country in countries)
+        {
+            countryA.options.Add(new Dropdown.OptionData() { text = country });
+            countryB.options.Add(new Dropdown.OptionData() { text = country });
+        }
+        int old_valueA = countryA.value;
 
+        int numTroops = GameObject.Find(countries[countryA.value]).GetComponent<CountryHandler>().country.troops - 1;
+        List<string> numTroopList = new List<string>();
+        for (int i = numTroops; i > 0; i--)
+            numTroopList.Add(i.ToString());
+        foreach (string num in numTroopList)
+            numTroopsDD.options.Add(new Dropdown.OptionData() { text = num });
+
+        while (!instance.manouvreOver)
+        {
+            if (countryA.value != old_valueA)
+            {
+                old_valueA = countryA.value;
+
+                numTroopsDD.options.Clear();
+                numTroopList.Clear();
+                numTroops = GameObject.Find(countries[countryA.value]).GetComponent<CountryHandler>().country.troops - 1;
+                for (int i = numTroops; i > 0; i--)
+                    numTroopList.Add(i.ToString());
+                foreach (string num in numTroopList)
+                {
+                    numTroopsDD.options.Add(new Dropdown.OptionData() { text = num });
+                    numTroopsDD.RefreshShownValue();
+                }
+            }
+            yield return null; // wait until next frame, then continue execution from here (loop continues)
+        }
+            
         // Attack
         print("Choose a country to attack");
         instance.playerTurn = true;
         while (!instance.turnOver)
             yield return null; // wait until next frame, then continue execution from here (loop continues)
         instance.playerTurn = false;
+    }
+
+    public void moveTroops()
+    {
+        Dropdown numTroopsDD = GameObject.Find("NumTroops").GetComponent<Dropdown>();
+        Dropdown countryA = GameObject.Find("CountryA").GetComponent<Dropdown>();
+        Dropdown countryB = GameObject.Find("CountryB").GetComponent<Dropdown>();
+
+        int numTroops = int.Parse(numTroopsDD.options[numTroopsDD.value].text);
+        string fromCountry = countryA.options[countryA.value].text;
+        string toCountry = countryB.options[countryB.value].text;
+
+        print("Move " + numTroops + " troops from " + fromCountry + " to " + toCountry);
+        GameObject.Find(fromCountry).GetComponent<CountryHandler>().country.troops -= numTroops;
+        GameObject.Find(toCountry).GetComponent<CountryHandler>().country.troops += numTroops;
+
+        numTroopsDD.RefreshShownValue();
     }
 
     // remove players with no countries left
