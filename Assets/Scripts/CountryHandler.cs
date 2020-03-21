@@ -64,11 +64,11 @@ public class CountryHandler : MonoBehaviour
     void OnMouseEnter()
     {
         oldColor = sprite.color;
-        if (country.controllingPlayer == Country.ControllingPlayers.Atlanteans)
+        if (!ManageGame.instance.playerTurn || country.controllingPlayer.ToString() == ManageGame.instance.playerTribe) 
         {
             hoverColor = oldColor;
         }
-        else
+        else if (country.controllingPlayer.ToString() != ManageGame.instance.playerTribe)
         {
             hoverColor = new Color32(oldColor.r, oldColor.g, oldColor.b, 250);
         }

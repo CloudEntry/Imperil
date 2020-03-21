@@ -88,25 +88,80 @@ public class ManageGame : MonoBehaviour
         {
             for (int i = 0; i < players.Length; i++)
             {
+                // if (iturn > 0) { i = iturn; continue; }  // skip to saved turn
+
+                // update money and exp UI
+                GameObject.Find("expText").GetComponent<Text>().text = instance.exp.ToString();
+                GameObject.Find("moneyText").GetComponent<Text>().text = "$" + instance.money.ToString();
+
                 removePlayers();    // remove players that have no countries left
 
                 Dictionary<string, List<string>> playerCountries = getPlayerCountriesDict();
 
+                List<string> currPlayerCountries = new List<string>();
+
+                if (playerCountries.ContainsKey(players[i]))
+                    currPlayerCountries = playerCountries[players[i]];
+                else continue;
+
                 // show player countries in UI Panel
 
+                highlightPlayerCountries(currPlayerCountries);  // highlight current player countries
+
                 // get reinforcements based on how many countries player owns
-                int reinforcements = playerCountries[players[i]].Count;
+                int reinforcements = currPlayerCountries.Count;
 
                 if (i == playerIndex)
-                    yield return playerMove(reinforcements, playerCountries[players[i]]);
+                    yield return playerMove(reinforcements, currPlayerCountries);
                 else if (players[i] != "")
                 {
                     aiMove(i, reinforcements);
-                    yield return new WaitForSeconds(0.1f);
+                    yield return new WaitForSeconds(1.0f);
                 }
                 iturn++;
             }
         }
+    }
+
+    public void highlightPlayerCountries(List<string> countryList)
+    {
+        byte opacity;
+        GameObject[] countries = GameObject.FindGameObjectsWithTag("Country") as GameObject[];
+        foreach (GameObject country in countries)
+        {
+            CountryHandler countHandler = country.GetComponent<CountryHandler>();
+            if (countryList.Contains(countHandler.country.name.ToString()))
+                opacity = 255;
+            else
+                opacity = 150;
+            if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Aborigines) { countHandler.TintColor(new Color32(153, 116, 61, opacity)); }
+            if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Annunaki) { countHandler.TintColor(new Color32(199, 113, 227, opacity)); }
+            if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Atlanteans) { countHandler.TintColor(new Color32(95, 175, 237, opacity)); }
+            if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Babylonians) { countHandler.TintColor(new Color32(95, 237, 185, opacity)); }
+            if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Celts) { countHandler.TintColor(new Color32(206, 242, 133, opacity)); }
+            if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Clovis) { countHandler.TintColor(new Color32(255, 0, 0, opacity)); }
+            if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Iberians) { countHandler.TintColor(new Color32(0, 1, 64, opacity)); }
+            if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Maya) { countHandler.TintColor(new Color32(255, 135, 0, opacity)); }
+            if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Nommo) { countHandler.TintColor(new Color32(105, 29, 62, opacity)); }
+            if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Olmecs) { countHandler.TintColor(new Color32(255, 251, 0, opacity)); }
+            if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Zoroastrians) { countHandler.TintColor(new Color32(0, 94, 13, opacity)); }
+        }
+    }
+
+    public void tintTextColor(string player)
+    {
+        Text ptText = GameObject.Find("PlayerTurnText").GetComponent<Text>();
+        if (player == "Aborigines") { ptText.color = new Color32(153, 116, 61, 255); }
+        if (player == "Annunaki") { ptText.color = new Color32(199, 113, 227, 255); }
+        if (player == "Atlanteans") { ptText.color = new Color32(95, 175, 237, 255); }
+        if (player == "Babylonians") { ptText.color = new Color32(95, 237, 185, 255); }
+        if (player == "Celts") { ptText.color = new Color32(206, 242, 133, 255); }
+        if (player == "Clovis") { ptText.color = new Color32(255, 0, 0, 255); }
+        if (player == "Iberians") { ptText.color = new Color32(0, 1, 64, 255); }
+        if (player == "Maya") { ptText.color = new Color32(255, 135, 0, 255); }
+        if (player == "Nommo") { ptText.color = new Color32(105, 29, 62, 255); }
+        if (player == "Olmecs") { ptText.color = new Color32(255, 251, 0, 255); }
+        if (player == "Zoroastrians") { ptText.color = new Color32(0, 94, 13, 255); }
     }
 
     public Dictionary<string, List<string>> getPlayerCountriesDict()
@@ -144,36 +199,36 @@ public class ManageGame : MonoBehaviour
     private void aiMove(int i, int reinforcements)
     {
         GameObject.Find("PlayerTurnText").GetComponent<Text>().text = players[i];
+        tintTextColor(players[i]);
         print(iturn + ": " + players[i] + " doing AI stuff");
 
-        // Pick random country to allocate reinforcements
+        // Easy Difficulty
+            // Pick random country to allocate reinforcements
 
-        // Manouvre troops
+            // Don't manouvre troops
 
-        // Attack
+            // Attack random country
     }
 
     private IEnumerator playerMove(int reinforcements, List<string> countries)
     {
         GameObject.Find("PlayerTurnText").GetComponent<Text>().text = players[playerIndex] + " (YOU)";
+        tintTextColor(players[playerIndex]);
         print(iturn + " YOU");
         instance.turnOver = false;
         instance.troopAllocateOver = false;
         instance.manouvreOver = false;
 
-        instance.playerTroopAllocate = true;
-
         // Assign reinforcements
-        print("Pick a country to allocate " + reinforcements + " reinforcements");  // Make this a UI Label
-
+        instance.playerTroopAllocate = true;
+        CountryManager.instance.TintCountries();    // tint other countries grey
+        GameObject.Find("PromptText").GetComponent<Text>().text = "Pick a country to allocate " + reinforcements.ToString() + " reinforcements";
         while (!instance.troopAllocateOver)
             yield return null; // wait until next frame, then continue execution from here (loop continues)
-        print("Allocate " + reinforcements + " troops to " + instance.allocateTroopsCountry.name.ToString());
         instance.allocateTroopsCountry.troops += reinforcements;
         instance.playerTroopAllocate = false;
-        
+
         // Manouvre troops
-        print("Manouvre Troops");
         mtPanel.SetActive(true);
         Dropdown numTroopsDD = GameObject.Find("NumTroops").GetComponent<Dropdown>();
         Dropdown countryA = GameObject.Find("CountryA").GetComponent<Dropdown>();
@@ -214,9 +269,11 @@ public class ManageGame : MonoBehaviour
             }
             yield return null; // wait until next frame, then continue execution from here (loop continues)
         }
-            
+        CountryManager.instance.TintCountries();    // tint countries back to normal
+
         // Attack
-        print("Choose a country to attack");
+        GameObject.Find("PromptText").GetComponent<Text>().text = "Choose a country to attack";
+
         instance.playerTurn = true;
         while (!instance.turnOver)
             yield return null; // wait until next frame, then continue execution from here (loop continues)
