@@ -14,6 +14,7 @@ public class ManageGame : MonoBehaviour
 
     public string attackedCountry;
     public string playerTribe = "Atlanteans";
+    public string difficulty = "easy";  // "medium", "hard"
     public Country allocateTroopsCountry;
 
     public bool battleHasEnded;
@@ -74,9 +75,6 @@ public class ManageGame : MonoBehaviour
         mtPanel = GameObject.Find("ManouvrePanel");
         mtPanel.SetActive(false);
 
-        // check how many troops assigned
-        print("=================================================");
-
         // begin main game loop
         StartCoroutine(gameLoop());
     }
@@ -105,6 +103,11 @@ public class ManageGame : MonoBehaviour
                 else continue;
 
                 // show player countries in UI Panel
+                string text = players[i] + ": ";
+                foreach (string country in currPlayerCountries)
+                    text += country + ", ";
+                text = text.Remove(text.Length - 2, 2);
+                print(text);
 
                 highlightPlayerCountries(currPlayerCountries);  // highlight current player countries
 
@@ -115,7 +118,7 @@ public class ManageGame : MonoBehaviour
                     yield return playerMove(reinforcements, currPlayerCountries);
                 else if (players[i] != "")
                 {
-                    aiMove(i, reinforcements);
+                    aiMove(i, reinforcements, playerCountries);
                     yield return new WaitForSeconds(1.0f);
                 }
                 iturn++;
@@ -196,25 +199,55 @@ public class ManageGame : MonoBehaviour
     }
 
     // AI Logic
-    private void aiMove(int i, int reinforcements)
+    private void aiMove(int i, int reinforcements, Dictionary<string, List<string>> playerCountries)
     {
         GameObject.Find("PlayerTurnText").GetComponent<Text>().text = players[i];
         tintTextColor(players[i]);
-        print(iturn + ": " + players[i] + " doing AI stuff");
+        
+        // Pick random country to allocate reinforcements
+        List<string> ownedCountries = playerCountries[players[i]];
+        int randomInt = Random.Range(0, ownedCountries.Count);
+        string randomCountry = ownedCountries[randomInt];
+        print(players[i] + " allocated " + reinforcements.ToString() + " troops to " + randomCountry);
+        GameObject.Find(randomCountry).GetComponent<CountryHandler>().country.troops += reinforcements;
 
-        // Easy Difficulty
-            // Pick random country to allocate reinforcements
+        // Don't manouvre troops on easy
+        // manouvre troops to maintain even distribution on medium
 
-            // Don't manouvre troops
+        // Attack random country
+        List<string> tcCandidates = new List<string>();
+        // Pick target country
+        foreach (string oc in ownedCountries)
+        {
+            string[] targetCountries = GameObject.Find(oc).GetComponent<CountryHandler>().neighbourCountries[oc];
+            foreach (string tc in targetCountries)
+                if (GameObject.Find(tc).GetComponent<CountryHandler>().country.controllingPlayer.ToString() != players[i] && !tcCandidates.Contains(GameObject.Find(tc).GetComponent<CountryHandler>().country.name.ToString()))
+                    tcCandidates.Add(GameObject.Find(tc).GetComponent<CountryHandler>().country.name.ToString());
+        }
 
-            // Attack random country
+        if (instance.difficulty == "easy")
+        {
+            string targetCountry = tcCandidates[0]; // easy just attacks first country
+        }
+        // medium attacks weakest country
+
+        // RNG for whether attacker wins 0 -> 1
+        int num = Random.Range(0, 2);
+        if (num == 1)
+        {
+            print(players[i] + " captured " + targetCountry);
+            CountryHandler count = GameObject.Find(targetCountry).GetComponent<CountryHandler>();
+            count.country.controllingPlayer = (Country.ControllingPlayers)System.Enum.Parse(typeof(Country.ControllingPlayers), players[i]);
+            GameObject.Find("CountryManager").GetComponent<CountryManager>().TintCountries();
+        }
+        
     }
 
     private IEnumerator playerMove(int reinforcements, List<string> countries)
     {
         GameObject.Find("PlayerTurnText").GetComponent<Text>().text = players[playerIndex] + " (YOU)";
         tintTextColor(players[playerIndex]);
-        print(iturn + " YOU");
+        print(iturn + ": YOU");
         instance.turnOver = false;
         instance.troopAllocateOver = false;
         instance.manouvreOver = false;
@@ -290,7 +323,6 @@ public class ManageGame : MonoBehaviour
         string fromCountry = countryA.options[countryA.value].text;
         string toCountry = countryB.options[countryB.value].text;
 
-        print("Move " + numTroops + " troops from " + fromCountry + " to " + toCountry);
         GameObject.Find(fromCountry).GetComponent<CountryHandler>().country.troops -= numTroops;
         GameObject.Find(toCountry).GetComponent<CountryHandler>().country.troops += numTroops;
 
@@ -365,7 +397,7 @@ public class ManageGame : MonoBehaviour
         }
         else
         {
-            print("No Saved File Found");
+            // print("No Saved File Found");
         }
     }
 
