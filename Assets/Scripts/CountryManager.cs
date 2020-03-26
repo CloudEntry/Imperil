@@ -34,18 +34,19 @@ public class CountryManager : MonoBehaviour
             countryList.Add(country);
         }
         ManageGame.instance.Loading(); // load game and tint countries accordingly
-        TintCountries();
+        // TintCountries();
+        ManageGame.instance.refreshTroopsLabels();
     }
 
     // Tints the country depending on which player is controlling it
     public void TintCountries()
     {
-        byte opacity = 150;
+        byte opacity = 255;
         for (int i = 0; i < countryList.Count; i++)
         {
             CountryHandler countHandler = countryList[i].GetComponent<CountryHandler>();
             if (ManageGame.instance.playerTroopAllocate) {
-                if (countHandler.country.controllingPlayer.ToString() != ManageGame.instance.playerTribe) { countHandler.TintColor(new Color32(1, 1, 1, opacity)); }
+                if (countHandler.country.controllingPlayer.ToString() != ManageGame.instance.playerTribe) { countHandler.TintColor(new Color32(1, 1, 1, 150)); }
             }
             else
             {
@@ -55,7 +56,7 @@ public class CountryManager : MonoBehaviour
                 if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Babylonians) { countHandler.TintColor(new Color32(95, 237, 185, opacity)); }
                 if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Celts) { countHandler.TintColor(new Color32(206, 242, 133, opacity)); }
                 if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Clovis) { countHandler.TintColor(new Color32(255, 0, 0, opacity)); }
-                if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Iberians) { countHandler.TintColor(new Color32(0, 1, 64, opacity)); }
+                if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Iberians) { countHandler.TintColor(new Color32(0, 1, 200, opacity)); }
                 if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Maya) { countHandler.TintColor(new Color32(255, 135, 0, opacity)); }
                 if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Nommo) { countHandler.TintColor(new Color32(105, 29, 62, opacity)); }
                 if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Olmecs) { countHandler.TintColor(new Color32(255, 251, 0, opacity)); }
@@ -82,7 +83,8 @@ public class CountryManager : MonoBehaviour
 
     public void StartBattle()
     {
-        GameObject.Find("PromptText").GetComponent<Text>().text = "";
+        Text promptText = GameObject.Find("PromptText2").GetComponent<Text>();
+        promptText.text = "";
 
         //SceneManager.LoadScene("Fight");
 
@@ -95,9 +97,22 @@ public class CountryManager : MonoBehaviour
             ManageGame.instance.exp += count.country.expReward;
             ManageGame.instance.money += count.country.moneyReward;
             TintCountries();
+            promptText.text = "YOU WON";
+        }
+        else
+        {
+            promptText.text = "YOU LOST";
         }
         DisableAttackPanel();
         ManageGame.instance.turnOver = true;
         ManageGame.instance.Saving(); // save game
+        StartCoroutine(DeletePromptText());
+    }
+
+    private IEnumerator DeletePromptText()
+    {
+        yield return new WaitForSeconds(2.0f);
+        Text promptText2 = GameObject.Find("PromptText2").GetComponent<Text>();
+        promptText2.text = "";
     }
 }
