@@ -100,6 +100,12 @@ public class ManageGame : MonoBehaviour
 
                 Dictionary<string, List<string>> playerCountries = getPlayerCountriesDict();
 
+                if (!playerCountries.ContainsKey(players[playerIndex]))   // If the player runs out of countries, game over
+                {
+                    print("You Lose");
+                    break;
+                }
+
                 List<string> currPlayerCountries = new List<string>();
 
                 if (playerCountries.ContainsKey(players[i]))
@@ -345,14 +351,32 @@ public class ManageGame : MonoBehaviour
                         {
                             best_ratio = ratio;
                             best_ratio_country = tc;
-                            // the attacking country is oc
                         }
                     }
                 }
             }
             targetCountry = best_ratio_country;
         }
-            
+
+        // get attacking country
+        int att_most_troops = 0;
+        string att_mt_country = "";
+        string[] att_nbCountries = GameObject.Find(targetCountry).GetComponent<CountryHandler>().neighbourCountries[targetCountry];
+        foreach (string nc in att_nbCountries)
+        {
+            if (GameObject.Find(nc).GetComponent<CountryHandler>().country.controllingPlayer.ToString() == players[i])
+            {
+                int att_troops = GameObject.Find(nc).GetComponent<CountryHandler>().country.troops;
+                if (att_troops > att_most_troops)
+                {
+                    att_most_troops = att_troops;
+                    att_mt_country = nc;
+                }
+            }
+        }
+        string attacking_country = att_mt_country;
+
+        print(players[i] + ": " + attacking_country + " vs " + targetCountry);
 
         // RNG for whether attacker wins 0 -> 1
         int num = Random.Range(0, 2);
@@ -366,10 +390,19 @@ public class ManageGame : MonoBehaviour
             count.country.controllingPlayer = (Country.ControllingPlayers)System.Enum.Parse(typeof(Country.ControllingPlayers), players[i]);
             ownedCountries = playerCountries[players[i]];
             highlightPlayerCountries(ownedCountries);
+
+            // if attacker wins, defending country troops = (attacking country troops -1) and attacking country troops = 1
+            print(attacking_country);
+            GameObject.Find(targetCountry).GetComponent<CountryHandler>().country.troops = GameObject.Find(attacking_country).GetComponent<CountryHandler>().country.troops - 1;
+            GameObject.Find(attacking_country).GetComponent<CountryHandler>().country.troops = 1;
         }
         else
         {
             promptText.text = "";
+
+            // if attacker loses, attacker's troops are halved
+            print(attacking_country);
+            GameObject.Find(attacking_country).GetComponent<CountryHandler>().country.troops = GameObject.Find(attacking_country).GetComponent<CountryHandler>().country.troops / 2;
         }
     }
 

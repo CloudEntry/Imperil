@@ -52,7 +52,7 @@ public class CountryHandler : MonoBehaviour
         {"Lechan", new string[] {"Gondwana", "Soma", "Punt"} },
         {"Punt", new string[] {"Lechan"} },
         {"Levant", new string[] {"Sierra", "Italia", "Babylonia", "Sumeria" , "Soma", "Gondwana"} },
-        {"Sumeria", new string[] {"Levant", "Babylonia", "Soma"} },
+        {"Sumeria", new string[] {"Orenia", "Levant", "Babylonia", "Soma"} },
         {"Babylonia", new string[] {"Serbek", "Levant", "Sumeria", "Orenia", "India"} },
     };
 

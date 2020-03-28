@@ -88,20 +88,48 @@ public class CountryManager : MonoBehaviour
 
         //SceneManager.LoadScene("Fight");
 
+        string attacked_country = ManageGame.instance.attackedCountry;
+        // get attacking country = country with the most troops
+        int most_troops = 0;
+        string mt_country = "";
+        string[] nbCountries = GameObject.Find(attacked_country).GetComponent<CountryHandler>().neighbourCountries[attacked_country];
+        foreach (string nc in nbCountries)
+        {
+            if (GameObject.Find(nc).GetComponent<CountryHandler>().country.controllingPlayer.ToString() == ManageGame.instance.playerTribe)
+            {
+                int troops = GameObject.Find(nc).GetComponent<CountryHandler>().country.troops;
+                if (troops > most_troops)
+                {
+                    most_troops = troops;
+                    mt_country = nc;
+                }
+            }
+        }
+        string attacking_country = mt_country;
+
+        print(attacking_country + " vs " + attacked_country);
+
         // RNG for whether attacker wins 0 -> 1
         int num = Random.Range(0, 2);
         if (num == 1)
         {
-            CountryHandler count = GameObject.Find(ManageGame.instance.attackedCountry).GetComponent<CountryHandler>();
-            count.country.controllingPlayer = Country.ControllingPlayers.Atlanteans;
+            CountryHandler count = GameObject.Find(attacked_country).GetComponent<CountryHandler>();
+            count.country.controllingPlayer = (Country.ControllingPlayers)System.Enum.Parse(typeof(Country.ControllingPlayers), ManageGame.instance.playerTribe); 
             ManageGame.instance.exp += count.country.expReward;
             ManageGame.instance.money += count.country.moneyReward;
             TintCountries();
             promptText.text = "YOU WON";
+
+            // if attacker wins, defending country troops = (attacking country troops -1) and attacking country troops = 1
+            GameObject.Find(attacked_country).GetComponent<CountryHandler>().country.troops = GameObject.Find(attacking_country).GetComponent<CountryHandler>().country.troops - 1;
+            GameObject.Find(attacking_country).GetComponent<CountryHandler>().country.troops = 1;
         }
         else
         {
             promptText.text = "YOU LOST";
+
+            // if attacker loses, attacker's troops are halved
+            GameObject.Find(attacking_country).GetComponent<CountryHandler>().country.troops = GameObject.Find(attacking_country).GetComponent<CountryHandler>().country.troops / 2;
         }
         DisableAttackPanel();
         ManageGame.instance.turnOver = true;
