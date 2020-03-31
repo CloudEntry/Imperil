@@ -52,8 +52,22 @@ public class CountryHandler : MonoBehaviour
         {"Lechan", new string[] {"Gondwana", "Soma", "Punt"} },
         {"Punt", new string[] {"Lechan"} },
         {"Levant", new string[] {"Sierra", "Italia", "Babylonia", "Sumeria" , "Soma", "Gondwana"} },
-        {"Sumeria", new string[] {"Orenia", "Levant", "Babylonia", "Soma"} },
-        {"Babylonia", new string[] {"Serbek", "Levant", "Sumeria", "Orenia", "India"} },
+        {"Sumeria", new string[] {"Orenia", "India", "Levant", "Babylonia", "Soma"} },
+        {"Babylonia", new string[] {"Serbek", "Levant", "Sumeria", "Orenia"} },
+    };
+
+    public Dictionary<string, string> cityCountry = new Dictionary<string, string>()
+    {
+        {"Chichen Itza", "Mehica"},
+        {"Akakor", "Tamoachan"},
+        {"Antilla", "Atlantis"},
+        {"Cadiz", "Hesperia"},
+        {"Camelot", "Alba"},
+        {"Giza", "Levant"},
+        {"Babylon", "Sumeria"},
+        {"Gobekli Tepe", "Orenia"},
+        {"Dropa", "Orientos"},
+        {"Madjedbebe", "East Mu"},
     };
 
     void Awake()

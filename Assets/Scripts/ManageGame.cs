@@ -157,7 +157,7 @@ public class ManageGame : MonoBehaviour
                 if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Iberians) { countHandler.TintColor(new Color32(0, 1, 200, opacity)); }
                 if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Maya) { countHandler.TintColor(new Color32(255, 135, 0, opacity)); }
                 if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Nommo) { countHandler.TintColor(new Color32(105, 29, 62, opacity)); }
-                if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Olmecs) { countHandler.TintColor(new Color32(255, 251, 0, opacity)); }
+                if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Olmecs) { countHandler.TintColor(new Color32(190, 190, 0, opacity)); }
                 if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Zoroastrians) { countHandler.TintColor(new Color32(0, 94, 13, opacity)); }
             }
             else
@@ -223,6 +223,20 @@ public class ManageGame : MonoBehaviour
         List<string> ownedCountries = playerCountries[players[i]];
         int randomInt = Random.Range(0, ownedCountries.Count);
         string randomCountry = ownedCountries[randomInt];
+
+        // Apply reinforcements bonus
+        CountryHandler cth = GameObject.Find(randomCountry).GetComponent<CountryHandler>();
+        if (GameObject.Find(cth.cityCountry["Cadiz"]).GetComponent<CountryHandler>().country.controllingPlayer.ToString() == players[i])
+            reinforcements *= 3;
+        if (GameObject.Find(cth.cityCountry["Camelot"]).GetComponent<CountryHandler>().country.controllingPlayer.ToString() == players[i])
+            reinforcements *= 2;
+        if (GameObject.Find(cth.cityCountry["Giza"]).GetComponent<CountryHandler>().country.controllingPlayer.ToString() == players[i])
+            reinforcements *= 5;
+        if (GameObject.Find(cth.cityCountry["Babylon"]).GetComponent<CountryHandler>().country.controllingPlayer.ToString() == players[i])
+            reinforcements *= 2;
+        if (GameObject.Find(cth.cityCountry["Dropa"]).GetComponent<CountryHandler>().country.controllingPlayer.ToString() == players[i])
+            reinforcements *= 3;
+
         GameObject.Find(randomCountry).GetComponent<CountryHandler>().country.troops += reinforcements;
         refreshTroopsLabels();
 
@@ -376,14 +390,63 @@ public class ManageGame : MonoBehaviour
         }
         string attacking_country = att_mt_country;
 
-        print(players[i] + ": " + attacking_country + " vs " + targetCountry);
+        int attTroops = GameObject.Find(attacking_country).GetComponent<CountryHandler>().country.troops;
+        int defTroops = GameObject.Find(targetCountry).GetComponent<CountryHandler>().country.troops;
 
-        // RNG for whether attacker wins 0 -> 1
-        int num = Random.Range(0, 2);
-        Text promptText = GameObject.Find("PromptText").GetComponent<Text>();
-        
-        if (num == 1)
+        // adjust for city perks
+        CountryHandler atc = GameObject.Find(attacking_country).GetComponent<CountryHandler>();
+        if (GameObject.Find(atc.cityCountry["Chichen Itza"]).GetComponent<CountryHandler>().country.controllingPlayer.ToString() == players[i])
+            attTroops += (int)(attTroops * 0.1);
+        if (GameObject.Find(atc.cityCountry["Akakor"]).GetComponent<CountryHandler>().country.controllingPlayer.ToString() == players[i])
+            attTroops += (int)(attTroops * 0.4);
+        if (GameObject.Find(atc.cityCountry["Antilla"]).GetComponent<CountryHandler>().country.controllingPlayer.ToString() == players[i])
+            attTroops += (int)(attTroops * 0.25);
+        if (GameObject.Find(atc.cityCountry["Cadiz"]).GetComponent<CountryHandler>().country.controllingPlayer.ToString() == players[i])
+            attTroops += (int)(attTroops * 0.1);
+        if (GameObject.Find(atc.cityCountry["Babylon"]).GetComponent<CountryHandler>().country.controllingPlayer.ToString() == players[i])
+            attTroops += (int)(attTroops * 0.1);
+        if (GameObject.Find(atc.cityCountry["Madjedbebe"]).GetComponent<CountryHandler>().country.controllingPlayer.ToString() == players[i])
+            attTroops += (int)(attTroops * 0.5);
+
+        CountryHandler dfc = GameObject.Find(targetCountry).GetComponent<CountryHandler>();
+        if (GameObject.Find(dfc.cityCountry["Chichen Itza"]).GetComponent<CountryHandler>().country.controllingPlayer == GameObject.Find(targetCountry).GetComponent<CountryHandler>().country.controllingPlayer)
+            defTroops += (int)(defTroops * 0.4);
+        if (GameObject.Find(dfc.cityCountry["Akakor"]).GetComponent<CountryHandler>().country.controllingPlayer == GameObject.Find(targetCountry).GetComponent<CountryHandler>().country.controllingPlayer)
+            defTroops += (int)(defTroops * 0.1);
+        if (GameObject.Find(dfc.cityCountry["Antilla"]).GetComponent<CountryHandler>().country.controllingPlayer == GameObject.Find(targetCountry).GetComponent<CountryHandler>().country.controllingPlayer)
+            defTroops += (int)(defTroops * 0.25);
+        if (GameObject.Find(dfc.cityCountry["Camelot"]).GetComponent<CountryHandler>().country.controllingPlayer == GameObject.Find(targetCountry).GetComponent<CountryHandler>().country.controllingPlayer)
+            defTroops += (int)(defTroops * 0.25);
+        if (GameObject.Find(dfc.cityCountry["Babylon"]).GetComponent<CountryHandler>().country.controllingPlayer == GameObject.Find(targetCountry).GetComponent<CountryHandler>().country.controllingPlayer)
+            defTroops += (int)(defTroops * 0.1);
+        if (GameObject.Find(dfc.cityCountry["Gobekli Tepe"]).GetComponent<CountryHandler>().country.controllingPlayer == GameObject.Find(targetCountry).GetComponent<CountryHandler>().country.controllingPlayer)
+            defTroops += (int)(defTroops * 0.5);
+        if (GameObject.Find(dfc.cityCountry["Dropa"]).GetComponent<CountryHandler>().country.controllingPlayer == GameObject.Find(targetCountry).GetComponent<CountryHandler>().country.controllingPlayer)
+            defTroops += (int)(defTroops * 0.1);
+
+        print(attacking_country + " (" + atc.country.controllingPlayer + ") " + atc.country.troops + "->" + attTroops + " vs " + targetCountry + " (" + dfc.country.controllingPlayer + ") " + dfc.country.troops + "->" + defTroops);
+
+        double troop_odds = (double)attTroops / defTroops;
+        double trunc_troop_odds = System.Math.Truncate(troop_odds * 100) / 100;
+        int rng = (int)(trunc_troop_odds * 10);
+        bool battle_won = false;
+
+        if (troop_odds > 1) // biased on how many attacking vs defending troops
         {
+            if (Random.Range(0, rng) != 1)
+                battle_won = true;
+        }
+        else
+        {
+            if (Random.Range(0, rng) == 1)
+                battle_won = true;
+        }
+        Text promptText = GameObject.Find("PromptText").GetComponent<Text>();
+        string result = "";
+
+        if (battle_won)
+        {
+            result = "WON";
             promptText.text = players[i] + " captured " + targetCountry;
             tintTextColor(players[i], promptText);
             CountryHandler count = GameObject.Find(targetCountry).GetComponent<CountryHandler>();
@@ -392,18 +455,19 @@ public class ManageGame : MonoBehaviour
             highlightPlayerCountries(ownedCountries);
 
             // if attacker wins, defending country troops = (attacking country troops -1) and attacking country troops = 1
-            print(attacking_country);
             GameObject.Find(targetCountry).GetComponent<CountryHandler>().country.troops = GameObject.Find(attacking_country).GetComponent<CountryHandler>().country.troops - 1;
             GameObject.Find(attacking_country).GetComponent<CountryHandler>().country.troops = 1;
         }
         else
         {
+            result = "LOST";
             promptText.text = "";
 
             // if attacker loses, attacker's troops are halved
-            print(attacking_country);
             GameObject.Find(attacking_country).GetComponent<CountryHandler>().country.troops = GameObject.Find(attacking_country).GetComponent<CountryHandler>().country.troops / 2;
         }
+
+        print(result);
     }
 
     private IEnumerator playerMove(int reinforcements, List<string> countries)
@@ -415,6 +479,19 @@ public class ManageGame : MonoBehaviour
         instance.turnOver = false;
         instance.troopAllocateOver = false;
         instance.manouvreOver = false;
+
+        // Apply reinforcements bonus
+        CountryHandler cth = GameObject.Find(countries[0]).GetComponent<CountryHandler>();
+        if (GameObject.Find(cth.cityCountry["Cadiz"]).GetComponent<CountryHandler>().country.controllingPlayer.ToString() == players[playerIndex])
+            reinforcements *= 3;
+        if (GameObject.Find(cth.cityCountry["Camelot"]).GetComponent<CountryHandler>().country.controllingPlayer.ToString() == players[playerIndex])
+            reinforcements *= 2;
+        if (GameObject.Find(cth.cityCountry["Giza"]).GetComponent<CountryHandler>().country.controllingPlayer.ToString() == players[playerIndex])
+            reinforcements *= 5;
+        if (GameObject.Find(cth.cityCountry["Babylon"]).GetComponent<CountryHandler>().country.controllingPlayer.ToString() == players[playerIndex])
+            reinforcements *= 2;
+        if (GameObject.Find(cth.cityCountry["Dropa"]).GetComponent<CountryHandler>().country.controllingPlayer.ToString() == players[playerIndex])
+            reinforcements *= 3;
 
         // Assign reinforcements
         instance.playerTroopAllocate = true;
