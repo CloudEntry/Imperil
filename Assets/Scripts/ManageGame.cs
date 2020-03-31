@@ -427,7 +427,7 @@ public class ManageGame : MonoBehaviour
         print(attacking_country + " (" + atc.country.controllingPlayer + ") " + atc.country.troops + "->" + attTroops + " vs " + targetCountry + " (" + dfc.country.controllingPlayer + ") " + dfc.country.troops + "->" + defTroops);
 
         double troop_odds = (double)attTroops / defTroops;
-        double trunc_troop_odds = System.Math.Truncate(troop_odds * 100) / 100;
+        double trunc_troop_odds = System.Math.Truncate(troop_odds * 100) / 100; 
         int rng = (int)(trunc_troop_odds * 10);
         bool battle_won = false;
 
@@ -565,11 +565,17 @@ public class ManageGame : MonoBehaviour
         string fromCountry = countryA.options[countryA.value].text;
         string toCountry = countryB.options[countryB.value].text;
 
-        GameObject.Find(fromCountry).GetComponent<CountryHandler>().country.troops -= numTroops;
-        GameObject.Find(toCountry).GetComponent<CountryHandler>().country.troops += numTroops;
+        if (GameObject.Find(fromCountry).GetComponent<CountryHandler>().country.troops < 2)   // don't manoeuvre troops if < 2
+        {
+            print("Not enough troops to manoeuvre");
+        }
+        else
+        {
+            GameObject.Find(fromCountry).GetComponent<CountryHandler>().country.troops -= numTroops;
+            GameObject.Find(toCountry).GetComponent<CountryHandler>().country.troops += numTroops;
+        }
 
         numTroopsDD.RefreshShownValue();
-
         refreshTroopsLabels();
     }
 
