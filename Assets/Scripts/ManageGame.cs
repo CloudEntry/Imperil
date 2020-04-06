@@ -1,20 +1,21 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using System.Threading.Tasks;
-using System.Text.RegularExpressions;
-
-using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
 
 public class ManageGame : MonoBehaviour
 {
     public static ManageGame instance;
 
     public string attackedCountry;
-    public string playerTribe = "Atlanteans";
+    public string playerTribe;
     public string difficulty = "hard";  // "easy", "medium"
     public Country allocateTroopsCountry;
 
@@ -33,10 +34,15 @@ public class ManageGame : MonoBehaviour
     public int turn = 0;
     public int iturn = 0;
     public int playerIndex = 0;
+    public List<int> playersIndexes = new List<int>();
 
     public string[] players = System.Enum.GetNames(typeof(Country.ControllingPlayers));
 
     public GameObject mtPanel;
+
+    public Client client;
+
+    public string cmov;
 
     [System.Serializable]
     public class SaveData
@@ -60,15 +66,17 @@ public class ManageGame : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         numPlayers = players.Length;
-
-        // get player index
-        for (int i = 0; i < numPlayers; i++)
+        client = FindObjectOfType<Client>();
+        // get player index and other players indexes
+        for (int i = 0; i < client.players.Count; i++)
         {
-            if (players[i] == playerTribe)
-            {
+            if (client.players[i].name == client.clientName)
                 playerIndex = i;
-            }
+            else
+                playersIndexes.Add(i);
         }
+        playerTribe = players[playerIndex];
+        print(client.clientName + ", tribe: " + playerTribe);
 
         instance.playerTurn = false;
         instance.playerTroopAllocate = false;
@@ -90,8 +98,8 @@ public class ManageGame : MonoBehaviour
                 // if (iturn > 0) { i = iturn; continue; }  // skip to saved turn
 
                 // update money and exp UI
-                GameObject.Find("expText").GetComponent<Text>().text = instance.exp.ToString();
-                GameObject.Find("moneyText").GetComponent<Text>().text = "$" + instance.money.ToString();
+                // GameObject.Find("expText").GetComponent<Text>().text = instance.exp.ToString();
+                // GameObject.Find("moneyText").GetComponent<Text>().text = "$" + instance.money.ToString();
 
                 Text promptText = GameObject.Find("PromptText").GetComponent<Text>();
                 tintTextColor("", promptText);
@@ -122,18 +130,29 @@ public class ManageGame : MonoBehaviour
                 tintTextColor(players[i], ptText);
 
                 refreshTroopsLabels();
-                highlightPlayerCountries(currPlayerCountries);  // highlight current player countries
+                // highlightPlayerCountries(currPlayerCountries);  // highlight current player countries
 
                 // get reinforcements based on how many countries player owns
                 int reinforcements = currPlayerCountries.Count;
 
                 if (i == playerIndex)
+                {
+                    print(client.clientName + ", your turn " + players[i]);
                     yield return playerMove(reinforcements, currPlayerCountries);
+                    // yield return new WaitForSeconds(2.0f);
+                }
+                else if (playersIndexes.Contains(i))
+                {
+                    print(client.players[i].name + "'s turn " + players[i]);
+                    yield return new WaitForSeconds(2.0f);
+                }
                 else if (players[i] != "")
                 {
+                    print("AI's turn " + players[i]);
                     aiMove(i, reinforcements, playerCountries);
                     yield return new WaitForSeconds(2.0f);
                 }
+
                 iturn++;
             }
         }
@@ -480,6 +499,8 @@ public class ManageGame : MonoBehaviour
         instance.troopAllocateOver = false;
         instance.manouvreOver = false;
 
+        cmov = "CMOV|";
+
         // Apply reinforcements bonus
         CountryHandler cth = GameObject.Find(countries[0]).GetComponent<CountryHandler>();
         if (GameObject.Find(cth.cityCountry["Cadiz"]).GetComponent<CountryHandler>().country.controllingPlayer.ToString() == players[playerIndex])
@@ -495,13 +516,15 @@ public class ManageGame : MonoBehaviour
 
         // Assign reinforcements
         instance.playerTroopAllocate = true;
-        CountryManager.instance.TintCountries();    // tint other countries grey
+        // CountryManager.instance.TintCountries();    // tint other countries grey
         GameObject.Find("PromptText").GetComponent<Text>().text = "Choose a country to allocate " + reinforcements.ToString() + " reinforcements";
         while (!instance.troopAllocateOver)
             yield return null; // wait until next frame, then continue execution from here (loop continues)
         instance.allocateTroopsCountry.troops += reinforcements;
         refreshTroopsLabels();
         instance.playerTroopAllocate = false;
+
+        cmov += instance.allocateTroopsCountry.name + reinforcements.ToString() + "|";
 
         // Manouvre troops
         mtPanel.SetActive(true);
@@ -546,6 +569,8 @@ public class ManageGame : MonoBehaviour
         }
         CountryManager.instance.TintCountries();    // tint countries back to normal
 
+        cmov = cmov.Remove(cmov.Length - 1, 1); // remove last comma
+
         // Attack
         GameObject.Find("PromptText").GetComponent<Text>().text = "Choose a country to attack";
 
@@ -553,6 +578,9 @@ public class ManageGame : MonoBehaviour
         while (!instance.turnOver)
             yield return null; // wait until next frame, then continue execution from here (loop continues)
         instance.playerTurn = false;
+
+        cmov += "|" + attackedCountry + ":" + battleWon;
+        print(cmov);
     }
 
     public void moveTroops()
@@ -577,6 +605,8 @@ public class ManageGame : MonoBehaviour
 
         numTroopsDD.RefreshShownValue();
         refreshTroopsLabels();
+
+        cmov += fromCountry + ":" + numTroops.ToString() + ":" + toCountry + ",";
     }
 
     // refresh country troops labels

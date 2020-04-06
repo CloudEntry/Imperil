@@ -73,6 +73,8 @@ public class CountryHandler : MonoBehaviour
     void Awake()
     {
         sprite = GetComponent<SpriteRenderer>();
+        //country.name = name;
+        //this.tag = "Country";
     }
 
     void OnMouseEnter()
@@ -119,13 +121,6 @@ public class CountryHandler : MonoBehaviour
     {
         ManageGame.instance.allocateTroopsCountry = country;
         ManageGame.instance.troopAllocateOver = true;
-    }
-
-    // sets name variable to name of Component in Unity
-    void OnDrawGizmos()
-    {
-        country.name = name;
-        this.tag = "Country";
     }
 
     public void TintColor(Color32 color)

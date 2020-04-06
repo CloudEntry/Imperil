@@ -33,7 +33,7 @@ public class CountryManager : MonoBehaviour
         {
             countryList.Add(country);
         }
-        ManageGame.instance.Loading(); // load game and tint countries accordingly
+        // ManageGame.instance.Loading(); // load game and tint countries accordingly
         // TintCountries();
         ManageGame.instance.refreshTroopsLabels();
     }
@@ -83,6 +83,8 @@ public class CountryManager : MonoBehaviour
 
     public void StartBattle()
     {
+        ManageGame.instance.battleWon = false;
+
         Text promptText = GameObject.Find("PromptText2").GetComponent<Text>();
         promptText.text = "";
 
@@ -178,6 +180,8 @@ public class CountryManager : MonoBehaviour
                 ManageGame.instance.money += count.country.moneyReward;
                 TintCountries();
                 promptText.text = "YOU WON";
+
+                ManageGame.instance.battleWon = true;
 
                 // if attacker wins, defending country troops = (attacking country troops -1) and attacking country troops = 1
                 GameObject.Find(attacked_country).GetComponent<CountryHandler>().country.troops = GameObject.Find(attacking_country).GetComponent<CountryHandler>().country.troops - 1;
