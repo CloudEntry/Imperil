@@ -88,6 +88,10 @@ public class Client : MonoBehaviour
             case "SCNN":
                 UserConnected(aData[1], false);
                 break;
+            case "CMOV":
+                print(data);
+                ManageGame.instance.processOpponentMove(data);
+                break;
         }
     }
 
@@ -97,9 +101,8 @@ public class Client : MonoBehaviour
         c.name = name;
         players.Add(c);
         
-        if (players.Count == 1)
+        if (players.Count == 2)
         {
-            Debug.Log("Starting game");
             GameManager.Instance.StartGame();
         }
     }

@@ -202,6 +202,11 @@ public class CountryManager : MonoBehaviour
             ManageGame.instance.turnOver = true;
             ManageGame.instance.Saving(); // save game
             StartCoroutine(DeletePromptText());
+
+            string cmov = ManageGame.instance.cmov;
+            cmov += "|" + attacked_country + ":" + result + ":" + attacking_country;
+            print(cmov);
+            ManageGame.instance.client.Send(cmov);
         }
     }
 

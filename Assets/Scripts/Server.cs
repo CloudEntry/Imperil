@@ -153,6 +153,9 @@ public class Server : MonoBehaviour
                 c.isHost = (aData[2] == "0") ? false : true;
                 Broadcast("SCNN|" + c.clientName, clients);  // tell all users a new users has just connected
                 break;
+            case "CMOV":
+                Broadcast(data, clients);
+                break;
         }
     }
 }
