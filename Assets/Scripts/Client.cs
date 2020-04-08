@@ -83,7 +83,7 @@ public class Client : MonoBehaviour
                 {
                     UserConnected(aData[i], false);
                 }
-                Send("CWHO|" + clientName + "|" + isHost);
+                Send("CWHO|" + clientName + "|" + ((isHost)?1:0).ToString());
                 break;
             case "SCNN":
                 UserConnected(aData[1], false);
