@@ -125,6 +125,7 @@ public class CountryHandler : MonoBehaviour
 
     public void TintColor(Color32 color)
     {
+        sprite = GetComponent<SpriteRenderer>();
         if (sprite)
             sprite.color = color;
         else
