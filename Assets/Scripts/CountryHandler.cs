@@ -125,7 +125,10 @@ public class CountryHandler : MonoBehaviour
 
     public void TintColor(Color32 color)
     {
-        sprite.color = color;
+        if (sprite)
+            sprite.color = color;
+        else
+            print("unable to tint " + country.name);
     }
 
     void ShowGUI()
