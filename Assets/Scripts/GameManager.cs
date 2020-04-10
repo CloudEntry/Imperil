@@ -18,6 +18,8 @@ public class GameManager : MonoBehaviour
 
     public InputField nameInput;
 
+    public int numPlayers;
+
     private void Start()
     {
         Instance = this;
@@ -35,6 +37,9 @@ public class GameManager : MonoBehaviour
     public void HostButton()
     {
         // try to create server
+        Dropdown PlayersDropdown = GameObject.Find("PlayersDropdown").GetComponent<Dropdown>();
+        numPlayers = PlayersDropdown.value + 1;
+
         try
         {
             Server s = Instantiate(serverPrefab).GetComponent<Server>();

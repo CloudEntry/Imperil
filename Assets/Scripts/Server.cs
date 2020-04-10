@@ -93,7 +93,7 @@ public class Server : MonoBehaviour
 
         StartListening();   // carry on listening for more clients
 
-        Broadcast("SWHO|" + allUsers, clients[clients.Count - 1]);  // send list of all users to last user
+        Broadcast("SWHO|" + allUsers + GameManager.Instance.numPlayers.ToString(), clients[clients.Count - 1]);  // send list of all users to last user
     }
 
     private bool IsConnected(TcpClient c)
@@ -151,7 +151,7 @@ public class Server : MonoBehaviour
             case "CWHO":
                 c.clientName = aData[1];
                 c.isHost = (aData[2] == "0") ? false : true;
-                Broadcast("SCNN|" + c.clientName, clients);  // tell all users a new users has just connected
+                Broadcast("SCNN|" + c.clientName + "|" + GameManager.Instance.numPlayers.ToString(), clients);  // tell all users a new users has just connected
                 break;
             case "CMOV":
                 Broadcast(data, clients);

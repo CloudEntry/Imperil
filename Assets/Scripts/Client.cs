@@ -18,6 +18,8 @@ public class Client : MonoBehaviour
 
     public List<GameClient> players = new List<GameClient>();
 
+    public int numPlayers;
+
     private void Start()
     {
         DontDestroyOnLoad(gameObject);
@@ -79,6 +81,7 @@ public class Client : MonoBehaviour
         switch (aData[0])
         {
             case "SWHO":
+                numPlayers = Convert.ToInt32(aData[aData.Length - 1]);
                 for (int i = 1; i < aData.Length - 1; i++)
                 {
                     UserConnected(aData[i], false);
@@ -86,6 +89,7 @@ public class Client : MonoBehaviour
                 Send("CWHO|" + clientName + "|" + ((isHost)?1:0).ToString());
                 break;
             case "SCNN":
+                numPlayers = Convert.ToInt32(aData[aData.Length - 1]);
                 UserConnected(aData[1], false);
                 break;
             case "CMOV":
@@ -100,11 +104,15 @@ public class Client : MonoBehaviour
         GameClient c = new GameClient();
         c.name = name;
         players.Add(c);
-        
-        if (players.Count == 2)
+
+        print(numPlayers + " vs " + players.Count);
+
+        if (players.Count == numPlayers)
         {
             GameManager.Instance.StartGame();
         }
+        else
+            print("only " + numPlayers + " players");
     }
 
     private void OnApplicationQuit()

@@ -41,6 +41,7 @@ public class ManageGame : MonoBehaviour
     public string[] players = System.Enum.GetNames(typeof(Country.ControllingPlayers));
 
     public GameObject mtPanel;
+    public GameObject igPanel;
 
     public Client client;
 
@@ -85,13 +86,14 @@ public class ManageGame : MonoBehaviour
 
         mtPanel = GameObject.Find("ManouvrePanel");
         mtPanel.SetActive(false);
+        igPanel = GameObject.Find("IGMenuPanel");
+        igPanel.SetActive(false);
 
         // begin main game loop
         StartCoroutine(gameLoop());
     }
 
-    // the main game loop
-    private IEnumerator gameLoop()
+    private IEnumerator gameLoop()  // the main game loop
     {
         while (true)
         {
@@ -111,7 +113,8 @@ public class ManageGame : MonoBehaviour
                 Dictionary<string, List<string>> playerCountries = getPlayerCountriesDict();
 
                 if (!playerCountries.ContainsKey(players[playerIndex]))   // If the player runs out of countries, game over
-                    yield return GameOver();
+                    SceneManager.LoadScene("Menu");
+                    // yield return GameOver();
 
                 List<string> currPlayerCountries = new List<string>();
 
@@ -427,9 +430,8 @@ public class ManageGame : MonoBehaviour
 
         return playerCountries;
     }
-
-    // AI Logic
-    private void aiMove(int i, int reinforcements, Dictionary<string, List<string>> playerCountries)
+ 
+    private void aiMove(int i, int reinforcements, Dictionary<string, List<string>> playerCountries)    // AI Logic
     {
         CountryManager.instance.TintCountries();
 
@@ -825,8 +827,7 @@ public class ManageGame : MonoBehaviour
         cmov += fromCountry + ":" + numTroops.ToString() + ":" + toCountry + ",";
     }
 
-    // refresh country troops labels
-    public void refreshTroopsLabels()
+    public void refreshTroopsLabels()   // refresh country troops labels
     {
         GameObject[] theArray = GameObject.FindGameObjectsWithTag("Country") as GameObject[];
         foreach (GameObject theCountry in theArray)
@@ -838,8 +839,7 @@ public class ManageGame : MonoBehaviour
         }
     }
 
-    // remove players with no countries left
-    public void removePlayers()
+    public void removePlayers() // remove players with no countries left
     {
         List<string> activePlayers = new List<string>();
         GameObject[] theArray = GameObject.FindGameObjectsWithTag("Country") as GameObject[];
@@ -917,5 +917,25 @@ public class ManageGame : MonoBehaviour
             File.Delete(Application.persistentDataPath + "/SaveFile.dat");
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
+    }
+
+    // In-Game Menu Button functions
+    public void ShowMenu()
+    {
+        igPanel.SetActive(true);
+    }
+    public void ChangeDiffButton()
+    {
+        string[] diffArr = { "easy", "medium", "hard" };
+        Dropdown AIDiffDropdown = GameObject.Find("AIDiffDropdown").GetComponent<Dropdown>();
+        difficulty = diffArr[AIDiffDropdown.value];
+    }
+    public void QuitButton()
+    {
+        SceneManager.LoadScene("Menu");
+    }
+    public void BackButton()
+    {
+        igPanel.SetActive(false);
     }
 }
