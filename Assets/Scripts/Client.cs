@@ -105,14 +105,10 @@ public class Client : MonoBehaviour
         c.name = name;
         players.Add(c);
 
-        print(numPlayers + " vs " + players.Count);
-
         if (players.Count == numPlayers)
         {
             GameManager.Instance.StartGame();
         }
-        else
-            print("only " + numPlayers + " players");
     }
 
     private void OnApplicationQuit()

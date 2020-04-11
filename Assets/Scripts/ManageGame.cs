@@ -29,6 +29,9 @@ public class ManageGame : MonoBehaviour
     public bool manouvreOver;
     public bool opponentTurn;
     public bool opponentTurnOver;
+    public bool troops100Flag;
+    public bool troops500Flag;
+    public bool troops1000Flag;
 
     public int exp;
     public int money;
@@ -147,7 +150,7 @@ public class ManageGame : MonoBehaviour
                 }
                 else if (players[i] != "")
                 {
-                    if (client.isHost)  // only process AI moves on 
+                    if (client.isHost)  // only process AI moves on host
                     {
                         aiMove(i, reinforcements, playerCountries);
                         yield return new WaitForSeconds(2.0f);
@@ -158,7 +161,7 @@ public class ManageGame : MonoBehaviour
                     }
                 }
 
-                highlightPlayerCountries(currPlayerCountries);  // highlight countries after attack :- later change with some animation
+                // highlightPlayerCountries(currPlayerCountries);  // highlight countries after attack :- later change with some animation
 
                 iturn++;
             }
@@ -285,9 +288,9 @@ public class ManageGame : MonoBehaviour
         // Attack
         // print(opponent + " attack: " + attack_cmd);
         string[] ac_str = attack_cmd.Split(':');
-        string ac_def_country = ac_str[0];
+        string ac_att_country = ac_str[0];
         string ac_win = ac_str[1];
-        string ac_att_country = ac_str[2];
+        string ac_def_country = ac_str[2];
         Text promptText = GameObject.Find("PromptText").GetComponent<Text>();
         int clientIndex = 0;
 
@@ -937,5 +940,19 @@ public class ManageGame : MonoBehaviour
     public void BackButton()
     {
         igPanel.SetActive(false);
+    }
+
+    // Store Menu Function
+    public void Set100TroopsFlag()
+    {
+        troops100Flag = true;
+    }
+    public void Set500TroopsFlag()
+    {
+        troops500Flag = true;
+    }
+    public void Set1000TroopsFlag()
+    {
+        troops1000Flag = true;
     }
 }
