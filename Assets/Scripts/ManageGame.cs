@@ -35,6 +35,7 @@ public class ManageGame : MonoBehaviour
 
     public int exp;
     public int money;
+    public int level;
     public int numPlayers;
     public int turn = 0;
     public int iturn = 0;
@@ -107,8 +108,14 @@ public class ManageGame : MonoBehaviour
             {
                 // if (iturn > 0) { i = iturn; continue; }  // skip to saved turn
 
-                // update money and exp UI
-                GameObject.Find("expText").GetComponent<Text>().text = instance.exp.ToString();
+                // update level, money and exp UI
+                int[] lvlExp = CheckLevel();
+                level = lvlExp[0];
+                GameObject.Find("lvlText").GetComponent<Text>().text = level.ToString();
+                if (lvlExp[1] == 0)
+                    GameObject.Find("expText").GetComponent<Text>().text = "(" + instance.exp.ToString() + ")";
+                else
+                    GameObject.Find("expText").GetComponent<Text>().text = "(" + instance.exp.ToString() + " / " + lvlExp[1] + ")";
                 GameObject.Find("moneyText").GetComponent<Text>().text = "$" + instance.money.ToString();
 
                 Text promptText = GameObject.Find("PromptText").GetComponent<Text>();
@@ -170,6 +177,61 @@ public class ManageGame : MonoBehaviour
             }
         }
     }
+
+    public int[] CheckLevel()
+    {
+        int lvl = 1;
+        int expNeeded = 20;
+
+        if (exp >= 20 && exp < 50)
+        {
+            lvl = 2;
+            expNeeded = 50;
+        }
+        if (exp >= 50 && exp < 90)
+        {
+            lvl = 3;
+            expNeeded = 90;
+        }
+        if (exp >= 90 && exp < 130)
+        {
+            lvl = 4;
+            expNeeded = 130;
+        }
+        if (exp >= 130 && exp < 170)
+        {
+            lvl = 5;
+            expNeeded = 170;
+        }
+        if (exp >= 170 && exp < 220)
+        {
+            lvl = 6;
+            expNeeded = 220;
+        }
+        if (exp >= 220 && exp < 270)
+        {
+            lvl = 7;
+            expNeeded = 270;
+        }
+        if (exp >= 270 && exp < 320)
+        {
+            lvl = 8;
+            expNeeded = 320;
+        }
+        if (exp >= 320 && exp < 370)
+        {
+            lvl = 9;
+            expNeeded = 370;
+        }
+        if (exp >= 370)
+        {
+            lvl = 10;
+            expNeeded = 0;
+        }
+
+        int[] lvlExp = { lvl, expNeeded };
+        return lvlExp;
+    }   // get the player's level and exp needed to reach next level
 
     public IEnumerator GameOver()
     {
@@ -960,11 +1022,20 @@ public class ManageGame : MonoBehaviour
     public void OpenStore()
     {
         stPanel.SetActive(true);
-        if (!troops100Flag) // reset buttons if perks have been used
+        // disable buttons if perk in use or level too low
+        if (troops100Flag) 
+            GameObject.Find("Troops100Button").GetComponent<Button>().interactable = false;
+        else
             GameObject.Find("Troops100Button").GetComponent<Button>().interactable = true;
-        if (!troops500Flag)
+
+        if (troops500Flag || level < 5)
+            GameObject.Find("Troops500Button").GetComponent<Button>().interactable = false;
+        else
             GameObject.Find("Troops500Button").GetComponent<Button>().interactable = true;
-        if (!troops1000Flag)
+
+        if (troops1000Flag || level < 10)
+            GameObject.Find("Troops1000Button").GetComponent<Button>().interactable = false;
+        else
             GameObject.Find("Troops1000Button").GetComponent<Button>().interactable = true;
     }
     public void CloseStore()
