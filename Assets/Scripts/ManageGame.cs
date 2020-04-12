@@ -45,6 +45,7 @@ public class ManageGame : MonoBehaviour
 
     public GameObject mtPanel;
     public GameObject igPanel;
+    public GameObject stPanel;
 
     public Client client;
 
@@ -91,6 +92,8 @@ public class ManageGame : MonoBehaviour
         mtPanel.SetActive(false);
         igPanel = GameObject.Find("IGMenuPanel");
         igPanel.SetActive(false);
+        stPanel = GameObject.Find("StorePanel");
+        stPanel.SetActive(false);
 
         // begin main game loop
         StartCoroutine(gameLoop());
@@ -734,6 +737,17 @@ public class ManageGame : MonoBehaviour
         if (GameObject.Find(cth.cityCountry["Dropa"]).GetComponent<CountryHandler>().country.controllingPlayer.ToString() == players[playerIndex])
             reinforcements *= 3;
 
+        // Add store upgrades and reset flags
+        if (troops100Flag)
+            reinforcements += 100;
+        if (troops500Flag)
+            reinforcements += 500;
+        if (troops1000Flag)
+            reinforcements += 1000;
+        troops100Flag = false;
+        troops500Flag = false;
+        troops1000Flag = false;
+
         // Assign reinforcements
         instance.playerTroopAllocate = true;
         // CountryManager.instance.TintCountries();    // tint other countries grey
@@ -942,17 +956,46 @@ public class ManageGame : MonoBehaviour
         igPanel.SetActive(false);
     }
 
-    // Store Menu Function
+    // Store menu function
+    public void OpenStore()
+    {
+        stPanel.SetActive(true);
+        if (!troops100Flag) // reset buttons if perks have been used
+            GameObject.Find("Troops100Button").GetComponent<Button>().interactable = true;
+        if (!troops500Flag)
+            GameObject.Find("Troops500Button").GetComponent<Button>().interactable = true;
+        if (!troops1000Flag)
+            GameObject.Find("Troops1000Button").GetComponent<Button>().interactable = true;
+    }
+    public void CloseStore()
+    {
+        stPanel.SetActive(false);
+    }
     public void Set100TroopsFlag()
     {
-        troops100Flag = true;
+        if (money >= 3000)
+        {
+            troops100Flag = true;
+            GameObject.Find("Troops100Button").GetComponent<Button>().interactable = false;
+            money -= 3000;
+        }
     }
     public void Set500TroopsFlag()
     {
-        troops500Flag = true;
+        if (money >= 7000)
+        {
+            troops500Flag = true;
+            GameObject.Find("Troops500Button").GetComponent<Button>().interactable = false;
+            money -= 7000;
+        }
     }
     public void Set1000TroopsFlag()
     {
-        troops1000Flag = true;
+        if (money >= 10000)
+        {
+            troops1000Flag = true;
+            GameObject.Find("Troops1000Button").GetComponent<Button>().interactable = false;
+            money -= 10000;
+        }
     }
 }
