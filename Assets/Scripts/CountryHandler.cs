@@ -77,24 +77,24 @@ public class CountryHandler : MonoBehaviour
         //this.tag = "Country";
     }
 
-    void OnMouseEnter()
-    {
-        oldColor = sprite.color;
-        if (!ManageGame.instance.playerTurn || country.controllingPlayer.ToString() == ManageGame.instance.playerTribe) 
-        {
-            hoverColor = oldColor;
-        }
-        else if (country.controllingPlayer.ToString() != ManageGame.instance.playerTribe)
-        {
-            hoverColor = new Color32(oldColor.r, oldColor.g, oldColor.b, 250);
-        }
-        sprite.color = hoverColor;
-    }
+    //void OnMouseEnter()
+    //{
+    //    oldColor = sprite.color;
+    //    if (!ManageGame.instance.playerTurn || country.controllingPlayer.ToString() == ManageGame.instance.playerTribe) 
+    //    {
+    //        hoverColor = oldColor;
+    //    }
+    //    else if (country.controllingPlayer.ToString() != ManageGame.instance.playerTribe)
+    //    {
+    //        hoverColor = new Color32(oldColor.r, oldColor.g, oldColor.b, 250);
+    //    }
+    //    sprite.color = hoverColor;
+    //}
 
-    void OnMouseExit()
-    {
-        sprite.color = oldColor;
-    }
+    //void OnMouseExit()
+    //{
+    //    sprite.color = oldColor;
+    //}
 
     // Method that shows attack panel if country not owned by player
     private void OnMouseUpAsButton()
@@ -134,7 +134,7 @@ public class CountryHandler : MonoBehaviour
 
     void ShowGUI()
     {
-        CountryManager.instance.ShowAttackPanel(country.name + " is owned by the " + country.controllingPlayer.ToString() + ". Are you sure you want to attack?", country.moneyReward, country.expReward);
+        CountryManager.instance.ShowAttackPanel(country.name, "Owned by the " + country.controllingPlayer.ToString() + ". Do you want to attack?", country.moneyReward, country.expReward);
         ManageGame.instance.attackedCountry = country.name;
         ManageGame.instance.battleHasEnded = false;
         ManageGame.instance.battleWon = false;

@@ -66,13 +66,36 @@ public class CountryManager : MonoBehaviour
     }
 
     // Method to show attack panel and display description, money and exp rewards in labels
-    public void ShowAttackPanel(string description, int moneyReward, int expReward)
+    public void ShowAttackPanel(string country, string description, int moneyReward, int expReward)
     {
         attackPanel.SetActive(true);
         AttackPanel gui = attackPanel.GetComponent<AttackPanel>();
         gui.descriptionText.text = description;
-        gui.moneyRewardText.text = "+" + moneyReward.ToString();
-        gui.expRewardText.text = "+" + expReward.ToString();
+        gui.moneyRewardText.text = "+ £" + moneyReward.ToString();
+        gui.expRewardText.text = "+ " + expReward.ToString();
+        GameObject.Find("CountryText").GetComponent<Text>().text = country;
+        if (country == "Mehica")
+            GameObject.Find("CityText").GetComponent<Text>().text = "City: Chichen Itza   Bonuses: Att+10%, Def+40%";
+        else if (country == "Tamoachan")
+            GameObject.Find("CityText").GetComponent<Text>().text = "City: Akakor   Bonuses: Att+40%, Def+10%";
+        else if (country == "Atlantis")
+            GameObject.Find("CityText").GetComponent<Text>().text = "City: Antilla   Bonuses: Att+25%, Def+25%";
+        else if (country == "Hesperia")
+            GameObject.Find("CityText").GetComponent<Text>().text = "City: Cadiz   Bonuses: Att+10%, Reinforcements x3";
+        else if (country == "Alba")
+            GameObject.Find("CityText").GetComponent<Text>().text = "City: Camelot   Bonuses: Def+25%, Reinforcements x2";
+        else if (country == "Levant")
+            GameObject.Find("CityText").GetComponent<Text>().text = "City: Giza   Bonuses: Reinforcements x5";
+        else if (country == "Sumeria")
+            GameObject.Find("CityText").GetComponent<Text>().text = "City: Babylon   Bonuses: Att+10%, Def+10%, Reinforcements x2";
+        else if (country == "Orenia")
+            GameObject.Find("CityText").GetComponent<Text>().text = "City: Gobekli Tepe   Bonuses: Def+50%";
+        else if (country == "Orientos")
+            GameObject.Find("CityText").GetComponent<Text>().text = "City: Dropa   Bonuses: Def+10%, Reinforcements x3";
+        else if (country == "East Mu")
+            GameObject.Find("CityText").GetComponent<Text>().text = "City: Madjedbebe   Bonuses: Att+50%";
+        else
+            GameObject.Find("CityText").GetComponent<Text>().text = "City: None";
     }
 
     // Method to hide attack panel

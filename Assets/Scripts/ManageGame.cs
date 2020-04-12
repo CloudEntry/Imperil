@@ -353,9 +353,9 @@ public class ManageGame : MonoBehaviour
         // Attack
         // print(opponent + " attack: " + attack_cmd);
         string[] ac_str = attack_cmd.Split(':');
-        string ac_att_country = ac_str[0];
+        string ac_def_country = ac_str[0];
         string ac_win = ac_str[1];
-        string ac_def_country = ac_str[2];
+        string ac_att_country = ac_str[2];
         Text promptText = GameObject.Find("PromptText").GetComponent<Text>();
         int clientIndex = 0;
 
@@ -376,7 +376,7 @@ public class ManageGame : MonoBehaviour
 
         if (ac_win == "WON")
         {
-            promptText.text = tribe + " captured " + ac_att_country;
+            promptText.text = tribe + " captured " + ac_def_country;
             tintTextColor(tribe, promptText);
             CountryHandler count = GameObject.Find(ac_def_country).GetComponent<CountryHandler>();
             count.country.controllingPlayer = (Country.ControllingPlayers)System.Enum.Parse(typeof(Country.ControllingPlayers), tribe);
@@ -448,7 +448,19 @@ public class ManageGame : MonoBehaviour
                 if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Zoroastrians) { countHandler.TintColor(new Color32(0, 94, 13, opacity)); }
             }
             else
-                countHandler.TintColor(new Color32(1, 1, 1, 150));
+            {
+                if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Aborigines) { countHandler.TintColor(new Color32(82, 61, 30, 255)); }
+                if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Annunaki) { countHandler.TintColor(new Color32(105, 61, 120, 255)); }
+                if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Atlanteans) { countHandler.TintColor(new Color32(55, 102, 138, 255)); }
+                if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Babylonians) { countHandler.TintColor(new Color32(48, 120, 94, 255)); }
+                if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Celts) { countHandler.TintColor(new Color32(104, 125, 62, 255)); }
+                if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Clovis) { countHandler.TintColor(new Color32(82, 2, 2, 255)); }
+                if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Iberians) { countHandler.TintColor(new Color32(0, 0, 77, 255)); }
+                if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Maya) { countHandler.TintColor(new Color32(128, 68, 0, 255)); }
+                if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Nommo) { countHandler.TintColor(new Color32(59, 16, 34, 255)); }
+                if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Olmecs) { countHandler.TintColor(new Color32(89, 89, 0, 255)); }
+                if (countHandler.country.controllingPlayer == Country.ControllingPlayers.Zoroastrians) { countHandler.TintColor(new Color32(0, 48, 7, 255)); }
+            }
         }
     }
 
@@ -1005,7 +1017,7 @@ public class ManageGame : MonoBehaviour
     }
     public void ChangeDiffButton()
     {
-        string[] diffArr = { "easy", "medium", "hard" };
+        string[] diffArr = { "hard", "medium", "easy" };
         Dropdown AIDiffDropdown = GameObject.Find("AIDiffDropdown").GetComponent<Dropdown>();
         difficulty = diffArr[AIDiffDropdown.value];
     }
