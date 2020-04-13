@@ -6,6 +6,7 @@ ScriptsOnlyBuild:
     - CountryHandler
     - CountryManager
     - GameManager
+    - Lobby
     - ManageGame
     - ManouvreTroopsPanel
     - MenuPanel
@@ -76,25 +77,25 @@ ScriptsOnlyBuild:
     - Class: 114
       Script: {instanceID: 12002}
     - Class: 114
-      Script: {instanceID: 12082}
+      Script: {instanceID: 12084}
     - Class: 114
-      Script: {instanceID: 12110}
+      Script: {instanceID: 12112}
     - Class: 114
-      Script: {instanceID: 12198}
+      Script: {instanceID: 12200}
     - Class: 114
-      Script: {instanceID: 12258}
+      Script: {instanceID: 12260}
     - Class: 114
-      Script: {instanceID: 12314}
+      Script: {instanceID: 12316}
     - Class: 114
-      Script: {instanceID: 12710}
+      Script: {instanceID: 12712}
     - Class: 114
-      Script: {instanceID: 12766}
+      Script: {instanceID: 12768}
     - Class: 114
-      Script: {instanceID: 13084}
+      Script: {instanceID: 13086}
     - Class: 114
-      Script: {instanceID: 13098}
+      Script: {instanceID: 13100}
     - Class: 114
-      Script: {instanceID: 13114}
+      Script: {instanceID: 13116}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 128
@@ -104,6 +105,65 @@ ScriptsOnlyBuild:
     - Class: 196
       Script: {instanceID: 0}
     - Class: 212
+      Script: {instanceID: 0}
+    - Class: 213
+      Script: {instanceID: 0}
+    - Class: 222
+      Script: {instanceID: 0}
+    - Class: 223
+      Script: {instanceID: 0}
+    - Class: 224
+      Script: {instanceID: 0}
+    Assets/Scenes/Lobby.unity:
+    - Class: 1
+      Script: {instanceID: 0}
+    - Class: 4
+      Script: {instanceID: 0}
+    - Class: 20
+      Script: {instanceID: 0}
+    - Class: 21
+      Script: {instanceID: 0}
+    - Class: 28
+      Script: {instanceID: 0}
+    - Class: 48
+      Script: {instanceID: 0}
+    - Class: 81
+      Script: {instanceID: 0}
+    - Class: 104
+      Script: {instanceID: 0}
+    - Class: 114
+      Script: {instanceID: 11152}
+    - Class: 114
+      Script: {instanceID: 11324}
+    - Class: 114
+      Script: {instanceID: 11326}
+    - Class: 114
+      Script: {instanceID: 11364}
+    - Class: 114
+      Script: {instanceID: 11678}
+    - Class: 114
+      Script: {instanceID: 11778}
+    - Class: 114
+      Script: {instanceID: 11980}
+    - Class: 114
+      Script: {instanceID: 12074}
+    - Class: 114
+      Script: {instanceID: 12200}
+    - Class: 114
+      Script: {instanceID: 12712}
+    - Class: 114
+      Script: {instanceID: 13086}
+    - Class: 114
+      Script: {instanceID: 13100}
+    - Class: 114
+      Script: {instanceID: 13116}
+    - Class: 115
+      Script: {instanceID: 0}
+    - Class: 128
+      Script: {instanceID: 0}
+    - Class: 157
+      Script: {instanceID: 0}
+    - Class: 196
       Script: {instanceID: 0}
     - Class: 213
       Script: {instanceID: 0}
@@ -149,19 +209,19 @@ ScriptsOnlyBuild:
     - Class: 114
       Script: {instanceID: 11998}
     - Class: 114
-      Script: {instanceID: 12198}
+      Script: {instanceID: 12200}
     - Class: 114
-      Script: {instanceID: 12400}
+      Script: {instanceID: 12402}
     - Class: 114
-      Script: {instanceID: 12710}
+      Script: {instanceID: 12712}
     - Class: 114
-      Script: {instanceID: 13084}
-    - Class: 114
-      Script: {instanceID: 13096}
+      Script: {instanceID: 13086}
     - Class: 114
       Script: {instanceID: 13098}
     - Class: 114
-      Script: {instanceID: 13114}
+      Script: {instanceID: 13100}
+    - Class: 114
+      Script: {instanceID: 13116}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 128
@@ -421,7 +481,13 @@ ScriptsOnlyBuild:
     className: TMP_SpriteAnimator
   - hash:
       serializedVersion: 2
-      Hash: ae906bb8e0f94cec6a3678e1ccc6523d
+      Hash: 0e8a515e7c67bd40acc4fa0acd70103d
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: Lobby
+  - hash:
+      serializedVersion: 2
+      Hash: 21b66dcc05c41d36bc59c58ace41c8ba
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: ManageGame
@@ -625,7 +691,7 @@ ScriptsOnlyBuild:
     className: Dropdown
   - hash:
       serializedVersion: 2
-      Hash: 804b2aa250870f3bc0c241ec2b6c5d88
+      Hash: 979384b0323212c083ac8ab2c795d455
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: Client
@@ -668,5 +734,6 @@ ScriptsOnlyBuild:
   platform: 5
   scenePathNames:
   - Assets/Scenes/Menu.unity
+  - Assets/Scenes/Lobby.unity
   - Assets/Scenes/Game.unity
   playerPath: C:/Users/jack_/Desktop/ImperilBuild/Imperil_.exe

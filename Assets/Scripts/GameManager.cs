@@ -103,6 +103,10 @@ public class GameManager : MonoBehaviour
     public void StartGame()
     {
         SceneManager.LoadScene("Game");
-        //print("Game starting");
+    }
+
+    public void EnterLobby()
+    {
+        SceneManager.LoadScene("Lobby");
     }
 }

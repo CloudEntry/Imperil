@@ -156,6 +156,9 @@ public class Server : MonoBehaviour
             case "CMOV":
                 Broadcast(data, clients);
                 break;
+            case "CTRB":
+                Broadcast(data, clients);
+                break;
         }
     }
 }

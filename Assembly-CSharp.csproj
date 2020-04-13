@@ -70,6 +70,7 @@
     <Compile Include="Assets\Scripts\CountryManager.cs" />
     <Compile Include="Assets\Scripts\FightSim.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
+    <Compile Include="Assets\Scripts\Lobby.cs" />
     <Compile Include="Assets\Scripts\ManageGame.cs" />
     <Compile Include="Assets\Scripts\ManouvreTroopsPanel.cs" />
     <Compile Include="Assets\Scripts\MenuPanel.cs" />

@@ -15,8 +15,10 @@ public class ManageGame : MonoBehaviour
     public static ManageGame instance;
 
     public string attackedCountry;
-    public string playerTribe;
     public string difficulty = "hard";  // "easy", "medium"
+    public string playerTribe;
+    public List<string> playerTribes = new List<string>();
+
     public Country allocateTroopsCountry;
 
     public bool battleHasEnded;
@@ -39,8 +41,6 @@ public class ManageGame : MonoBehaviour
     public int numPlayers;
     public int turn = 0;
     public int iturn = 0;
-    public int playerIndex = 0;
-    public List<int> playersIndexes = new List<int>();
 
     public string[] players = System.Enum.GetNames(typeof(Country.ControllingPlayers));
 
@@ -74,17 +74,15 @@ public class ManageGame : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         numPlayers = players.Length;
+
         client = FindObjectOfType<Client>();
-        // get player index and other players indexes
-        for (int i = 0; i < client.players.Count; i++)
+        playerTribe = client.tribe;
+
+        foreach (GameClient p in client.players)
         {
-            if (client.players[i].name == client.clientName)
-                playerIndex = i;
-            else
-                playersIndexes.Add(i);
+            if (p.name != client.clientName)
+                playerTribes.Add(p.tribe);
         }
-        playerTribe = players[playerIndex];
-        // print(client.clientName + ", tribe: " + playerTribe);
 
         instance.playerTurn = false;
         instance.playerTroopAllocate = false;
@@ -125,7 +123,7 @@ public class ManageGame : MonoBehaviour
 
                 Dictionary<string, List<string>> playerCountries = getPlayerCountriesDict();
 
-                if (!playerCountries.ContainsKey(players[playerIndex]))   // If the player runs out of countries, game over
+                if (!playerCountries.ContainsKey(client.tribe))   // If the player runs out of countries, game over
                     SceneManager.LoadScene("Menu");
                     // yield return GameOver();
 
@@ -150,11 +148,11 @@ public class ManageGame : MonoBehaviour
                 // get reinforcements based on how many countries player owns
                 int reinforcements = currPlayerCountries.Count;
 
-                if (i == playerIndex)
+                if (players[i] == playerTribe)
                 {
                     yield return playerMove(reinforcements, currPlayerCountries);
                 }
-                else if (playersIndexes.Contains(i))
+                else if (playerTribes.Contains(players[i]))
                 {
                     yield return waitForOpponentMove(i);
                 }
@@ -248,7 +246,17 @@ public class ManageGame : MonoBehaviour
         Text ptText = GameObject.Find("PlayerTurnText").GetComponent<Text>();
         ptText.text = players[i];
         tintTextColor(players[i], ptText);
-        GameObject.Find("PromptText").GetComponent<Text>().text = client.players[i].name + "'s turn"; 
+
+        string turnTribe = "";
+        foreach (GameClient p in client.players)
+        {
+            if (p.tribe == players[i])
+            {
+                turnTribe = p.name;
+                break;
+            }
+        }
+        GameObject.Find("PromptText").GetComponent<Text>().text = turnTribe + "'s turn"; 
 
         print("Waiting for opponent move");
         instance.opponentTurn = true;
@@ -357,7 +365,6 @@ public class ManageGame : MonoBehaviour
         string ac_win = ac_str[1];
         string ac_att_country = ac_str[2];
         Text promptText = GameObject.Find("PromptText").GetComponent<Text>();
-        int clientIndex = 0;
 
         string tribe = "";
         if (opp_type == "player")
@@ -365,9 +372,11 @@ public class ManageGame : MonoBehaviour
             for (int i = 0; i < client.players.Count; i++)  // get opponent index
             {
                 if (client.players[i].name == opponent)
-                    clientIndex = i;
+                {
+                    tribe = client.players[i].tribe;
+                    break;
+                }
             }
-            tribe = ManageGame.instance.players[clientIndex];
         }
         else
         {
@@ -513,8 +522,6 @@ public class ManageGame : MonoBehaviour
  
     private void aiMove(int i, int reinforcements, Dictionary<string, List<string>> playerCountries)    // AI Logic
     {
-        CountryManager.instance.TintCountries();
-
         Text ptText = GameObject.Find("PlayerTurnText").GetComponent<Text>();
         ptText.text = players[i];
         tintTextColor(players[i], ptText);
@@ -789,8 +796,8 @@ public class ManageGame : MonoBehaviour
         //CountryManager.instance.TintCountries();
 
         Text ptText = GameObject.Find("PlayerTurnText").GetComponent<Text>();
-        ptText.text = players[playerIndex] + " (YOU)";
-        tintTextColor(players[playerIndex], ptText);
+        ptText.text = client.tribe + " (YOU)";
+        tintTextColor(client.tribe, ptText);
         // print(iturn + ": YOU");
         instance.turnOver = false;
         instance.troopAllocateOver = false;
@@ -800,15 +807,15 @@ public class ManageGame : MonoBehaviour
 
         // Apply reinforcements bonus
         CountryHandler cth = GameObject.Find(countries[0]).GetComponent<CountryHandler>();
-        if (GameObject.Find(cth.cityCountry["Cadiz"]).GetComponent<CountryHandler>().country.controllingPlayer.ToString() == players[playerIndex])
+        if (GameObject.Find(cth.cityCountry["Cadiz"]).GetComponent<CountryHandler>().country.controllingPlayer.ToString() == client.tribe)
             reinforcements *= 3;
-        if (GameObject.Find(cth.cityCountry["Camelot"]).GetComponent<CountryHandler>().country.controllingPlayer.ToString() == players[playerIndex])
+        if (GameObject.Find(cth.cityCountry["Camelot"]).GetComponent<CountryHandler>().country.controllingPlayer.ToString() == client.tribe)
             reinforcements *= 2;
-        if (GameObject.Find(cth.cityCountry["Giza"]).GetComponent<CountryHandler>().country.controllingPlayer.ToString() == players[playerIndex])
+        if (GameObject.Find(cth.cityCountry["Giza"]).GetComponent<CountryHandler>().country.controllingPlayer.ToString() == client.tribe)
             reinforcements *= 5;
-        if (GameObject.Find(cth.cityCountry["Babylon"]).GetComponent<CountryHandler>().country.controllingPlayer.ToString() == players[playerIndex])
+        if (GameObject.Find(cth.cityCountry["Babylon"]).GetComponent<CountryHandler>().country.controllingPlayer.ToString() == client.tribe)
             reinforcements *= 2;
-        if (GameObject.Find(cth.cityCountry["Dropa"]).GetComponent<CountryHandler>().country.controllingPlayer.ToString() == players[playerIndex])
+        if (GameObject.Find(cth.cityCountry["Dropa"]).GetComponent<CountryHandler>().country.controllingPlayer.ToString() == client.tribe)
             reinforcements *= 3;
 
         // Add store upgrades and reset flags

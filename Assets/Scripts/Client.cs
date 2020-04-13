@@ -8,6 +8,7 @@ using UnityEngine;
 public class Client : MonoBehaviour
 {
     public string clientName;
+    public string tribe;
     public bool isHost;
 
     private bool socketReady;
@@ -96,6 +97,11 @@ public class Client : MonoBehaviour
                 print(data);
                 ManageGame.instance.processOpponentMove(data);
                 break;
+            case "CTRB":
+                print(data);
+                SetPlayerTribe(data);
+                Lobby.Instance.UpdatePlayerTribes(data);
+                break;
         }
     }
 
@@ -107,7 +113,22 @@ public class Client : MonoBehaviour
 
         if (players.Count == numPlayers)
         {
-            GameManager.Instance.StartGame();
+            GameManager.Instance.EnterLobby();
+        }
+    }
+
+    private void SetPlayerTribe(string data)
+    {
+        string[] arr = data.Split('|');
+        string player = arr[1];
+        string tribe = arr[2];
+
+        foreach (GameClient p in players)
+        {
+            if (p.name == player)
+            {
+                p.tribe = tribe;
+            }
         }
     }
 
@@ -138,5 +159,6 @@ public class GameClient
 {
     public string name;
     public bool isHost;
+    public string tribe;
 }
 
