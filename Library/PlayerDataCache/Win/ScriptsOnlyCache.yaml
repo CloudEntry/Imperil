@@ -421,7 +421,7 @@ ScriptsOnlyBuild:
     className: TMP_SpriteAnimator
   - hash:
       serializedVersion: 2
-      Hash: 2c4c6139f8a116719c08ab12facaf6e4
+      Hash: ae906bb8e0f94cec6a3678e1ccc6523d
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: ManageGame
