@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     public GameObject mainMenu;
     public GameObject serverMenu;
     public GameObject connectMenu;
+    public GameObject scrollArea;
 
     public GameObject serverPrefab;
     public GameObject clientPrefab;
@@ -31,6 +32,7 @@ public class GameManager : MonoBehaviour
     public void ConnectButton()
     {
         mainMenu.SetActive(false);
+        scrollArea.SetActive(false);
         connectMenu.SetActive(true);
     }
 
@@ -59,6 +61,7 @@ public class GameManager : MonoBehaviour
         }
 
         mainMenu.SetActive(false);
+        scrollArea.SetActive(false);
         serverMenu.SetActive(true);
     }
 
@@ -77,6 +80,7 @@ public class GameManager : MonoBehaviour
                 c.clientName = "Client";
             c.ConnectToServer(hostAddress, 6321);
             connectMenu.SetActive(false);
+            scrollArea.SetActive(true);
         }
         catch (Exception e)
         {
@@ -87,6 +91,7 @@ public class GameManager : MonoBehaviour
     public void BackButton()
     {
         mainMenu.SetActive(true);
+        scrollArea.SetActive(true);
         serverMenu.SetActive(false);
         connectMenu.SetActive(false);
 

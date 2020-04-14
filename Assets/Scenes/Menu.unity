@@ -723,6 +723,7 @@ MonoBehaviour:
   mainMenu: {fileID: 1476824431}
   serverMenu: {fileID: 1700995862}
   connectMenu: {fileID: 1216509529}
+  scrollArea: {fileID: 1302284686}
   serverPrefab: {fileID: 2134819021584322886, guid: f2d210aced0c33b458f2f20a3bbbfe01,
     type: 3}
   clientPrefab: {fileID: 6277068650352207343, guid: 0254b4d5d2b0412489c729e71256410f,
@@ -2446,7 +2447,7 @@ MonoBehaviour:
     owned country.\r\n\r\nCannot attack countries with a country with only 1 troop.\r\n\r\nA
     player can only attack a country if they own a country bordering it.\t\r\n\r\nWhen
     a player chooses a country to attack, their neighbouring country with the most
-    troops is\r chosen to automatically attack it.\r\n\r\nThe odds of the attacking
+    troops is\r chosen automatically to attack it.\r\n\r\nThe odds of the attacking
     country capturing the defending country are calculated using the number\r of
     attacking vs defending troops, but it is possible (though unlikely) to capture
     a country with\r fewer than the defending troops. \r\n\r\nThe player who has
@@ -2458,8 +2459,8 @@ MonoBehaviour:
     Giza, Levant - Reinforcements x5\r\n- Babylon, Sumeria - Att+10%, Def+10%, Reinforcements
     x2\r\n- Gobekli Tepe, Orenia - Def+50%\r\n- Dropa, Orientos - Def+10%, Reinforcements
     x3\r\n- Madjedbebe, East Mu - Att+50%\r\n\r\nAll city bonuses can stack.\r\n\r\n\nStore\r\n\nPlayers
-    are able to purchase more reinforcements from the store if they above the required
-    level.\n"
+    are able to purchase more reinforcements from the store at any time if they are
+    above the required level.\n"
 --- !u!222 &1237984571
 CanvasRenderer:
   m_ObjectHideFlags: 0
